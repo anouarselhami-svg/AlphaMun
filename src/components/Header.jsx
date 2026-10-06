@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ArrowUpRight } from './icons';
 const links = [['histoire', 'L’esprit Alpha'], ['comites', 'Comités'], ['packs', 'Les packs'], ['faq', 'FAQ']];
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function Header() {
     <nav id="navigation" className={open ? 'open' : ''} aria-label="Navigation principale">
       {links.map(([id, label]) => <a key={id} href={`#${id}`} className={active === id ? 'active' : ''} aria-current={active === id ? 'location' : undefined} onClick={() => setOpen(false)}>{label}</a>)}
     </nav>
-    <a className="button small" href="#inscription" onClick={() => setOpen(false)}>S’inscrire <span aria-hidden="true">↗</span></a>
+    <a className="button small" href="#inscription" onClick={() => setOpen(false)}>S’inscrire <ArrowUpRight /></a>
     <button className={`menu ${open ? 'is-open' : ''}`} aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} aria-controls="navigation" aria-expanded={open} onClick={() => setOpen(!open)}><span /><span /></button>
   </header>;
 }
