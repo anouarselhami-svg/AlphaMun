@@ -488,6 +488,7 @@ nav a:after {
   position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   border: 1px solid var(--line);
   background: linear-gradient(125deg,#fffaf2,#f5e9d6);
   transition: transform .25s,box-shadow .25s;
@@ -529,6 +530,7 @@ nav a:after {
 .pack li:before {
   content: '✓';
   color: var(--wine);
+  flex-shrink: 0;
 }
 
 .premium {
@@ -568,6 +570,43 @@ nav a:after {
 .registration {
   display: grid;
   background: var(--surface);
+}
+
+.registration-confirmation {
+  align-items: start;
+}
+
+.confirmation-card {
+  border: 1px solid var(--line);
+  background: #faf3e866;
+}
+
+.confirmation-card dl {
+  margin: 20px 0 26px;
+}
+
+.confirmation-card dl div {
+  display: grid;
+  grid-template-columns: minmax(90px, .45fr) 1fr;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.confirmation-card dt {
+  color: var(--muted);
+}
+
+.confirmation-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.field-error {
+  display: block;
+  color: var(--wine);
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .registration>div>p:not(.eyebrow) {
@@ -619,16 +658,26 @@ input:focus,select:focus,textarea:focus {
   box-shadow: 0 0 0 3px #790e120b;
 }
 
+input[aria-invalid="true"],select[aria-invalid="true"],textarea[aria-invalid="true"] {
+  border-color: var(--wine);
+}
+
 textarea {
   resize: vertical;
 }
 
 .checkbox {
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: start;
   font-weight: 400;
   color: var(--muted);
   line-height: 1.8;
+}
+
+.checkbox .field-error {
+  flex-basis: 100%;
+  margin-left: 28px;
 }
 
 .checkbox input {
