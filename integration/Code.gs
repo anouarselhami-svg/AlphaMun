@@ -38,6 +38,7 @@ function doPost(e) {
       sheet = spreadsheet.insertSheet('Inscriptions');
       sheet.appendRow(['Date', 'Prénom', 'Nom', 'Email', 'Établissement', 'Expérience MUN', 'Comité', 'Pack DH']);
     }
+    sheet.getRange('A:A').setNumberFormat('dd/MM/yyyy HH:mm:ss');
     const safe = value => /^[=+@\-]/.test(String(value || '')) ? "'" + value : String(value || '');
     phase = 'append';
     sheet.appendRow([new Date(), ...[p.prenom, p.nom, p.email, p.etablissement, p.experience, p.comite, p.pack].map(safe)]);

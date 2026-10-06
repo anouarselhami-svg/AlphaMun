@@ -53,7 +53,13 @@ const script = await fs.readFile(new URL('../integration/Code.gs', import.meta.u
 function scriptContext({ id = '', active = null, failLock = false, failWrite = false } = {}) {
   const rows = [], logs = [];
   let releases = 0, openedId;
-  const sheet = { appendRow(row) { if (failWrite) throw Error('Write failed'); rows.push(row); } };
+  const sheet = {
+    appendRow(row) { if (failWrite) throw Error('Write failed'); rows.push(row); },
+    getRange(range) {
+      assert.equal(range, 'A:A');
+      return { setNumberFormat(format) { assert.equal(format, 'dd/MM/yyyy HH:mm:ss'); } };
+    },
+  };
   const spreadsheet = { getSheetByName: () => sheet };
   const context = vm.createContext({
     Utilities: { getUuid: () => 'reference' },
