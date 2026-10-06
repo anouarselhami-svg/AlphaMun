@@ -1,0 +1,153 @@
+{
+  "capturedAt": "2026-10-06T13:32:12.873Z",
+  "domain": "youthglobalclub.com",
+  "resolver": "https://dns.google/resolve",
+  "completeZoneExport": false,
+  "note": "DKIM selectors, verification records and custom hostnames require the complete current DNS zone from Hostinger. No nameserver change is authorized by this partial snapshot.",
+  "records": [
+    {
+      "name": "youthglobalclub.com",
+      "type": "NS",
+      "status": 0,
+      "answers": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 2,
+          "TTL": 21600,
+          "data": "cosmos.dns-parking.com."
+        },
+        {
+          "name": "youthglobalclub.com.",
+          "type": 2,
+          "TTL": 21600,
+          "data": "nova.dns-parking.com."
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "youthglobalclub.com",
+      "type": "MX",
+      "status": 0,
+      "answers": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 15,
+          "TTL": 14400,
+          "data": "5 mx1.hostinger.com."
+        },
+        {
+          "name": "youthglobalclub.com.",
+          "type": 15,
+          "TTL": 14400,
+          "data": "10 mx2.hostinger.com."
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "youthglobalclub.com",
+      "type": "TXT",
+      "status": 0,
+      "answers": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 16,
+          "TTL": 3600,
+          "data": "v=spf1 include:_spf.mail.hostinger.com ~all"
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "youthglobalclub.com",
+      "type": "A",
+      "status": 0,
+      "answers": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 1,
+          "TTL": 50,
+          "data": "2.57.91.91"
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "youthglobalclub.com",
+      "type": "AAAA",
+      "status": 0,
+      "answers": [],
+      "authority": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 6,
+          "TTL": 600,
+          "data": "nova.dns-parking.com. dns.hostinger.com. 2026100507 10000 2400 604800 600"
+        }
+      ]
+    },
+    {
+      "name": "youthglobalclub.com",
+      "type": "CAA",
+      "status": 0,
+      "answers": [],
+      "authority": [
+        {
+          "name": "youthglobalclub.com.",
+          "type": 6,
+          "TTL": 600,
+          "data": "nova.dns-parking.com. dns.hostinger.com. 2026100507 10000 2400 604800 600"
+        }
+      ]
+    },
+    {
+      "name": "_dmarc.youthglobalclub.com",
+      "type": "TXT",
+      "status": 0,
+      "answers": [
+        {
+          "name": "_dmarc.youthglobalclub.com.",
+          "type": 16,
+          "TTL": 3600,
+          "data": "v=DMARC1; p=none"
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "www.youthglobalclub.com",
+      "type": "CNAME",
+      "status": 0,
+      "answers": [
+        {
+          "name": "www.youthglobalclub.com.",
+          "type": 5,
+          "TTL": 300,
+          "data": "youthglobalclub.com."
+        }
+      ],
+      "authority": []
+    },
+    {
+      "name": "www.youthglobalclub.com",
+      "type": "A",
+      "status": 0,
+      "answers": [
+        {
+          "name": "www.youthglobalclub.com.",
+          "type": 5,
+          "TTL": 300,
+          "data": "youthglobalclub.com."
+        },
+        {
+          "name": "youthglobalclub.com.",
+          "type": 1,
+          "TTL": 50,
+          "data": "2.57.91.91"
+        }
+      ],
+      "authority": []
+    }
+  ]
+}

@@ -1,0 +1,532 @@
+/* Desktop dimensions are isolated from mobile. */
+
+@media (width > 760px) {
+  header {
+    top: 0;
+    gap: 24px;
+    height: 92px;
+    padding: 0 var(--gutter);
+  }
+  .brand {
+    gap: 12px;
+    letter-spacing: 1px;
+  }
+  .brand small {
+    letter-spacing: 2.5px;
+    margin-top: 8px;
+  }
+  .brand-mark {
+    height: 46px;
+    width: 56px;
+  }
+  nav {
+    gap: 30px;
+    font-size: 12px;
+  }
+  nav a {
+    padding: 10px 0;
+  }
+  nav a:after {
+    bottom: 3px;
+    height: 1px;
+    left: 0;
+    width: 0;
+  }
+  nav a:hover:after,nav a.active:after {
+    width: 100%;
+  }
+  .button {
+    gap: 32px;
+    min-height: 56px;
+    padding: 14px 23px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+  .button span {
+    font-size: 21px;
+  }
+  .button.small {
+    min-height: 42px;
+    padding: 9px 18px;
+    gap: 24px;
+    font-size: 12px;
+  }
+  .text-link {
+    gap: 18px;
+    padding: 5px 0;
+    font-size: 12px;
+  }
+  .eyebrow {
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 2.2px;
+    margin-bottom: 24px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .hero {
+    grid-template-columns: 1.08fr 1fr;
+    gap: clamp(28px,5vw,75px);
+    padding: 48px var(--gutter) 64px;
+    min-height: 740px;
+  }
+  .hero-copy {
+    padding: 20px 0;
+  }
+  .intro {
+    font-size: 15px;
+    max-width: 420px;
+    margin-bottom: 33px;
+  }
+  .hero-actions {
+    gap: 25px;
+    flex-wrap: wrap;
+  }
+  .hero-foot {
+    gap: 20px;
+    max-width: 465px;
+    margin-top: 54px;
+    padding-top: 27px;
+  }
+  .hero-date {
+    gap: 17px;
+  }
+  .date-number {
+    letter-spacing: -1px;
+  }
+  .hero-date>span:last-child {
+    font-size: 9px;
+    letter-spacing: 1.7px;
+  }
+  .edition small {
+    margin-top: 5px;
+  }
+  .hero-art {
+    min-height: 600px;
+    border-radius: 8px;
+  }
+  .hero-art:before {
+    inset: 15px;
+    border-radius: 6px;
+  }
+  .hero-art:after {
+    width: 700px;
+    height: 700px;
+    left: 35%;
+    top: -100px;
+    border-radius: 50%;
+  }
+  .art-top {
+    padding: 32px 32px 10px;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    margin-top: 0;
+  }
+  .emblem-stage {
+    padding: 20px 45px 10px;
+  }
+  .hero-logo {
+    width: 100%;
+    max-width: 340px;
+    height: 260px;
+  }
+  .emblem-wordmark {
+    letter-spacing: 6px;
+    margin-top: 15px;
+  }
+  .emblem-wordmark small {
+    letter-spacing: 3.5px;
+    margin-top: 12px;
+  }
+  .ornament {
+    font-size: 19px;
+  }
+  .ornament-one {
+    left: 35px;
+    top: 38px;
+  }
+  .ornament-two {
+    right: 35px;
+    bottom: 28px;
+  }
+  .ornament:before {
+    width: 70px;
+    height: 100px;
+    border-radius: 100%;
+    left: -20px;
+    top: -22px;
+  }
+  .assembly-drawing {
+    width: 100%;
+    height: 120px;
+    margin: -10px 0 -30px;
+  }
+  .art-caption {
+    padding: 10px 32px 22px;
+    letter-spacing: 2px;
+    gap: 16px;
+  }
+  .hero-art .art-signup {
+    min-height: 48px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    gap: 10px;
+  }
+  .art-label {
+    gap: 13px;
+    padding: 19px 20px;
+    font-size: 8px;
+    letter-spacing: 1.7px;
+  }
+  .countdown {
+    padding: 40px var(--gutter);
+    gap: 40px;
+  }
+  .countdown .eyebrow {
+    margin-bottom: 12px;
+  }
+  .countdown h2 {
+    font-size: 26px;
+    letter-spacing: -.7px;
+  }
+  .countdown p:last-child {
+    font-size: 11px;
+    margin: 12px 0 0;
+  }
+  .timer {
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px;
+  }
+  .timer div {
+    min-width: 84px;
+    padding: 8px 16px;
+  }
+  .timer span {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+  .section {
+    padding: 100px var(--gutter);
+  }
+  .story {
+    grid-template-columns: 1fr 1fr;
+    gap: 55px;
+  }
+  .story-text p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .tags {
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+  }
+  .tags span {
+    font-size: 10px;
+    padding: 6px 13px;
+    border-radius: 20px;
+  }
+  .stats {
+    grid-column: 1/-1;
+    grid-template-columns: repeat(4,1fr);
+    padding-top: 38px;
+    margin-top: 5px;
+  }
+  .stats div {
+    padding: 0 28px;
+  }
+  .stats div:first-child {
+    padding-left: 0;
+  }
+  .stats b {
+    letter-spacing: -2px;
+  }
+  .stats span {
+    font-size: 11px;
+    margin-top: 8px;
+  }
+  .section-heading {
+    gap: 45px;
+    margin-bottom: 43px;
+  }
+  .section-heading>p {
+    max-width: 310px;
+    font-size: 13px;
+    margin: 0;
+  }
+  .committee-panel {
+    gap: 25px;
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .committee-panel+.committee-panel {
+    margin-top: 16px;
+  }
+  .committee-symbol {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+  }
+  .committee-panel .eyebrow {
+    font-size: 8px;
+    margin-bottom: 10px;
+  }
+  .committee-panel h3 {
+    font-size: 23px;
+    margin-bottom: 12px;
+  }
+  .committee-panel p:last-child {
+    font-size: 12px;
+    max-width: 520px;
+    margin: 0;
+  }
+  .committee-panel .text-link {
+    margin-left: auto;
+  }
+  .pack-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+  }
+  .pack {
+    padding: 37px;
+    border-radius: 5px;
+  }
+  .pack-title {
+    gap: 14px;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    padding-bottom: 24px;
+    margin-bottom: 27px;
+  }
+  .pack h3 {
+    font-size: 34px;
+    margin: 0;
+  }
+  .price {
+    letter-spacing: -3px;
+    margin: 22px 0 15px;
+  }
+  .price span {
+    letter-spacing: 1px;
+    margin-left: 3px;
+  }
+  .pack>p:not(.price) {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+  .pack ul {
+    padding: 22px 0;
+    margin: 22px 0 25px;
+  }
+  .pack li {
+    font-size: 12px;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .pack li:before {
+    font-size: 12px;
+  }
+  .pack .button {
+    width: 100%;
+    margin-top: auto;
+  }
+  .premium:after {
+    right: 35px;
+    top: 91px;
+    font-size: 22px;
+  }
+  .registration {
+    grid-template-columns: .9fr 1.1fr;
+    gap: 80px;
+  }
+  .registration h2 {
+    font-size: 66px;
+  }
+  .registration>div>p:not(.eyebrow) {
+    font-size: 13px;
+    max-width: 320px;
+    margin-top: 25px;
+  }
+  .notice {
+    padding: 15px 18px;
+    border-radius: 3px;
+    font-size: 11px !important;
+  }
+  .registration form {
+    padding: 32px;
+    border-radius: 5px;
+  }
+  form {
+    gap: 19px;
+  }
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  label {
+    gap: 8px;
+    font-size: 11px;
+  }
+  input,select,textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  textarea {
+    min-height: 125px;
+  }
+  select {
+    min-height: 47px;
+  }
+  .checkbox {
+    gap: 10px;
+    font-size: 10px;
+  }
+  .checkbox input {
+    width: 15px;
+    height: 15px;
+    margin: 3px 0 0;
+  }
+  form [role=status] {
+    font-size: 11px;
+    margin: 0;
+  }
+  .sponsors:before,.sponsors:after {
+    top: 46%;
+    left: 9%;
+    font-size: 30px;
+  }
+  .sponsors:after {
+    left: auto;
+    right: 9%;
+  }
+  .sponsors h2 {
+    font-size: 54px;
+  }
+  .sponsors p:not(.eyebrow) {
+    font-size: 13px;
+    margin: 25px 0 30px;
+  }
+  .faq {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 70px;
+  }
+  details {
+    padding: 22px 0;
+  }
+  summary {
+    gap: 20px;
+    font-size: 13px;
+  }
+  summary span {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+  details p {
+    font-size: 12px;
+    padding-right: 40px;
+    margin: 17px 0 0;
+  }
+  .contact {
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+  }
+  .contact p:not(.eyebrow) {
+    font-size: 13px;
+    margin-top: 25px;
+  }
+  .muted {
+    font-size: 11px !important;
+  }
+  .contact form {
+    padding-top: 4px;
+  }
+  footer {
+    gap: 25px;
+    padding: 32px var(--gutter);
+  }
+  footer p {
+    font-size: 16px;
+    margin: 0;
+  }
+  footer>a:last-child {
+    font-size: 10px;
+    letter-spacing: .5px;
+  }
+  .hero-date {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .date-number {
+    font-size: clamp(25px, 2.5vw, 34px);
+  }
+  .hero-date > span:last-child {
+    font-size: 9px;
+  }
+}
+
+@media (760px < width <= 1050px) {
+  nav {
+    gap: 18px;
+  }
+  .hero {
+    gap: 30px;
+  }
+  .hero-art {
+    min-height: 560px;
+  }
+  .art-top {
+    font-size: 7px;
+    padding-inline: 24px;
+  }
+  .emblem-stage {
+    padding-inline: 30px;
+  }
+  .emblem-wordmark {
+    font-size: 29px;
+  }
+  .hero-art .art-signup {
+    font-size: 13px;
+    padding-inline: 12px;
+  }
+  .art-caption {
+    font-size: 20px;
+    padding-inline: 24px;
+  }
+  .registration,.contact {
+    gap: 40px;
+  }
+  .committee-panel {
+    flex-wrap: wrap;
+  }
+  .committee-panel .text-link {
+    margin-left: 93px;
+  }
+  .timer div {
+    min-width: 66px;
+    padding-inline: 10px;
+  }
+  .pack {
+    padding: 28px;
+  }
+  .pack-title {
+    letter-spacing: 1px;
+  }
+  .premium:after {
+    right: 25px;
+  }
+}
+
+@media (min-width: 1650px) {
+  .hero,.section,.countdown {
+    padding-left: calc((100vw - 1400px)/2);
+    padding-right: calc((100vw - 1400px)/2);
+  }
+}
