@@ -17,7 +17,9 @@ function Registration({ pack, onChoosePack }) {
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [confirmation, setConfirmation] = useState(null);
+  const [committeeChoices, setCommitteeChoices] = useState(["", "", ""]);
   const sending = useRef(false);
+  const committeeCount = config.committees.length;
 
   function markInvalid(event) {
     const field = event.target;
@@ -35,6 +37,7 @@ function Registration({ pack, onChoosePack }) {
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form));
     data.ville = data.ville.trim();
+    data.comite = data.comite_choix_1 || "";
     sending.current = true;
     setPending(true);
     setStatus("Envoi en cours\u2026");
@@ -44,6 +47,7 @@ function Registration({ pack, onChoosePack }) {
       setConfirmation(data);
       setStatus("");
       form.reset();
+      setCommitteeChoices(["", "", ""]);
       onChoosePack("");
     } catch (error) {
       const reason = error instanceof RegistrationError
@@ -57,6 +61,26 @@ function Registration({ pack, onChoosePack }) {
       sending.current = false;
       setPending(false);
     }
+
+  }
+
+  function chooseCommittee(index, value) {
+    setCommitteeChoices(previous => previous.map((choice, choiceIndex) => (
+      choiceIndex !== index && choice === value ? "" : choiceIndex === index ? value : choice
+    )));
+    setFieldErrors(previous => ({ ...previous, [`comite_choix_${index + 1}`]: "" }));
+  }
+
+  function committeeOptions(selected) {
+    return config.committees.map(committee => (
+      <option
+        key={committee.name}
+        value={committee.name}
+        disabled={committeeChoices.includes(committee.name) && selected !== committee.name}
+      >
+        {committee.name}
+      </option>
+    ));
   }
 
   if (confirmation) {
@@ -73,8 +97,10 @@ function Registration({ pack, onChoosePack }) {
           <div><dt>Nom</dt><dd>{confirmation.nom}</dd></div>
           <div><dt>E-mail</dt><dd>{confirmation.email}</dd></div>
           <div><dt>Ville</dt><dd>{confirmation.ville}</dd></div>
+          {["comite_choix_1", "comite_choix_2", "comite_choix_3"].map((field, index) => confirmation[field] ? <div key={field}><dt>{["Premier", "Deuxième", "Troisième"][index]} choix de comité</dt><dd>{confirmation[field]}</dd></div> : null)}
           <div><dt>Pack</dt><dd>{packLabels[confirmation.pack] || confirmation.pack}</dd></div>
         </dl>
+        <p>Les choix expriment vos préférences et ne garantissent pas l’attribution d’un comité.</p>
         <a className="button outline" href="#accueil">Retour à l’accueil <ArrowUpRight /></a>
       </div>
     </section>;
@@ -97,9 +123,13 @@ function Registration({ pack, onChoosePack }) {
         <label>Ville de résidence<input name="ville" required placeholder="Ex. : Kénitra" aria-invalid={Boolean(fieldErrors.ville)} aria-describedby={fieldErrors.ville ? "ville-error" : undefined} /><FieldError name="ville" message={fieldErrors.ville} /></label>
         <label>Établissement<input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
       </div>
-      <div className="form-row">
-        <label>Expérience MUN<select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
-        <label>Comité souhaité<select name="comite" id="committee-select" required={config.committees.length > 0} aria-invalid={Boolean(fieldErrors.comite)} aria-describedby={fieldErrors.comite ? "comite-error" : undefined}><option value="">{config.committees.length ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{config.committees.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}</select><FieldError name="comite" message={fieldErrors.comite} /></label>
+      <label>Expérience MUN<select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
+      <div className="form-row committee-choices">
+        {[0, 1, 2].map(index => {
+          const fieldName = `comite_choix_${index + 1}`;
+          const required = committeeCount > index;
+          return <label key={fieldName}>{["Premier", "Deuxième", "Troisième"][index]} choix de comité<select name={fieldName} value={committeeChoices[index]} required={required} disabled={!committeeCount} onChange={event => chooseCommittee(index, event.target.value)} aria-invalid={Boolean(fieldErrors[fieldName])} aria-describedby={fieldErrors[fieldName] ? `${fieldName}-error` : undefined}><option value="">{committeeCount ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{committeeOptions(committeeChoices[index])}</select><FieldError name={fieldName} message={fieldErrors[fieldName]} /></label>;
+        })}
       </div>
       <label>Votre pack<select name="pack" id="pack-select" required value={pack} onChange={(event) => onChoosePack(event.target.value)} aria-invalid={Boolean(fieldErrors.pack)} aria-describedby={fieldErrors.pack ? "pack-error" : undefined}><option value="">Choisir votre expérience</option><option value="550">Pack délégué — 550 DH</option><option value="1550">Pack avec hôtel — 1 550 DH</option></select><FieldError name="pack" message={fieldErrors.pack} /></label>
       <label>Why do you want to participate in Alpha MUN, and what do you hope to gain from this experience? | Pourquoi souhaitez-vous participer au Alpha MUN et qu’espérez-vous tirer de cette expérience ?<textarea name="motivation" placeholder="Votre réponse (facultatif)" rows="5" /></label>

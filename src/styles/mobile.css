@@ -726,6 +726,9 @@
   .school-row {
     grid-template-columns: 1fr;
   }
+  .committee-choices {
+    grid-template-columns: 1fr;
+  }
   label {
     min-width: 0;
     gap: 6px;

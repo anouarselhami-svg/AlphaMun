@@ -7,7 +7,7 @@ const endpoint = 'https://script.google.com/macros/s/test/exec';
 const source = (await fs.readFile(new URL('../src/services/registration.js', import.meta.url), 'utf8'))
   .replace("import { config } from '../config';", `const config = { appsScriptUrl: ${JSON.stringify(endpoint)} };`);
 const { submitRegistration } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
-const data = { nom: 'Test', prenom: 'Alpha', email: 'test@example.com', etablissement: 'Test', ville: 'Kénitra', experience: 'Première participation', comite: '', pack: '550', motivation: 'Découvrir la diplomatie.', confirmation_pack: 'on' };
+const data = { nom: 'Test', prenom: 'Alpha', email: 'test@example.com', etablissement: 'Test', ville: 'Kénitra', experience: 'Première participation', comite: '', comite_choix_1: '', comite_choix_2: '', comite_choix_3: '', pack: '550', motivation: 'Découvrir la diplomatie.', confirmation_pack: 'on' };
 test('POST form contains all required fields and follows redirects once', async () => {
   const original = globalThis.fetch;
   let calls = 0;
@@ -59,7 +59,7 @@ function scriptContext({ id = '', active = null, failLock = false, failWrite = f
     getRange(...args) {
       if (args[0] === 'A:A') return { setNumberFormat(format) { assert.equal(format, 'dd/MM/yyyy HH:mm:ss'); } };
       if (args.length === 4) assert.equal(args.join(','), '1,1,1,8');
-      if (args.length === 2) return { setValue(value) { assert.ok(['Ville', 'Motivation', 'Pack assumé'].includes(value)); } };
+      if (args.length === 2) return { setValue(value) { assert.ok(['Ville', 'Motivation', 'Pack assumé', 'Comité — choix 1', 'Comité — choix 2', 'Comité — choix 3'].includes(value)); } };
       return {
         getValues() { return [['Date', 'Prénom', 'Nom', 'Email', 'Établissement', 'Expérience MUN', 'Comité', 'Pack DH']]; },
       };
@@ -83,6 +83,12 @@ test('script rejects invalid data before accessing Sheets', () => {
   assert.equal(state.rows.length, 0);
   assert.equal(state.releases(), 0);
 });
+test('script rejects duplicate committee choices', () => {
+  const state = scriptContext();
+  assert.equal(state.context.doPost({ parameter: { ...data, comite_choix_1: 'Conseil', comite_choix_2: 'Conseil', type: 'registration' } }).code, 'DUPLICATE_COMMITTEE_CHOICES');
+  assert.equal(state.rows.length, 0);
+  assert.equal(state.releases(), 0);
+});
 test('missing active spreadsheet returns an actionable code', () => {
   const state = scriptContext();
   assert.equal(state.context.doPost({ parameter: { ...data, type: 'registration' } }).code, 'SPREADSHEET_NOT_CONFIGURED');
@@ -97,6 +103,7 @@ test('explicit spreadsheet ID saves once and logs no form values', () => {
   assert.equal(state.rows[0][3], data.email);
   assert.equal(state.rows[0][8], data.ville);
   assert.equal(state.rows[0][10], data.confirmation_pack);
+  assert.equal(state.rows[0][11], data.comite_choix_1);
   assert.equal(state.logs[0].code, 'REGISTRATION_SAVED');
   assert.ok(!JSON.stringify(state.logs).includes(data.email));
 });
