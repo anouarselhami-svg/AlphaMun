@@ -641,6 +641,11 @@ label {
   font-weight: 500;
 }
 
+.required-mark {
+  color: var(--wine);
+  font-weight: 700;
+}
+
 input,select,textarea {
   background: #fffaf3;
   border: 1px solid var(--line);
@@ -675,7 +680,7 @@ textarea {
   line-height: 1.8;
 }
 
-.checkbox span {
+.checkbox > span {
   flex: 1 1 0;
   min-width: 0;
 }

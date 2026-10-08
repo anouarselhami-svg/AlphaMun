@@ -12,6 +12,10 @@ function FieldError({ name, message }) {
   return message ? <span className="field-error" id={`${name}-error`} role="alert">{message}</span> : null;
 }
 
+function RequiredMark() {
+  return <span className="required-mark" aria-hidden="true">*</span>;
+}
+
 function Registration({ pack, onChoosePack }) {
   const [status, setStatus] = useState("");
   const [pending, setPending] = useState(false);
@@ -115,26 +119,26 @@ function Registration({ pack, onChoosePack }) {
     </div>
     <form id="registration-form" onSubmit={handleSubmit} onInvalid={markInvalid}>
       <div className="form-row">
-        <label>Prénom<input name="prenom" required autoComplete="given-name" placeholder="Votre prénom" aria-invalid={Boolean(fieldErrors.prenom)} aria-describedby={fieldErrors.prenom ? "prenom-error" : undefined} /><FieldError name="prenom" message={fieldErrors.prenom} /></label>
-        <label>Nom<input name="nom" required autoComplete="family-name" placeholder="Votre nom" aria-invalid={Boolean(fieldErrors.nom)} aria-describedby={fieldErrors.nom ? "nom-error" : undefined} /><FieldError name="nom" message={fieldErrors.nom} /></label>
+        <label><span>Prénom <RequiredMark /></span><input name="prenom" required autoComplete="given-name" placeholder="Votre prénom" aria-invalid={Boolean(fieldErrors.prenom)} aria-describedby={fieldErrors.prenom ? "prenom-error" : undefined} /><FieldError name="prenom" message={fieldErrors.prenom} /></label>
+        <label><span>Nom <RequiredMark /></span><input name="nom" required autoComplete="family-name" placeholder="Votre nom" aria-invalid={Boolean(fieldErrors.nom)} aria-describedby={fieldErrors.nom ? "nom-error" : undefined} /><FieldError name="nom" message={fieldErrors.nom} /></label>
       </div>
-      <label>E-mail<input name="email" type="email" required autoComplete="email" placeholder="vous@exemple.com" aria-invalid={Boolean(fieldErrors.email)} aria-describedby={fieldErrors.email ? "email-error" : undefined} /><FieldError name="email" message={fieldErrors.email} /></label>
+      <label><span>E-mail <RequiredMark /></span><input name="email" type="email" required autoComplete="email" placeholder="vous@exemple.com" aria-invalid={Boolean(fieldErrors.email)} aria-describedby={fieldErrors.email ? "email-error" : undefined} /><FieldError name="email" message={fieldErrors.email} /></label>
       <div className="form-row school-row">
-        <label>Ville de résidence<input name="ville" required placeholder="Ex. : Kénitra" aria-invalid={Boolean(fieldErrors.ville)} aria-describedby={fieldErrors.ville ? "ville-error" : undefined} /><FieldError name="ville" message={fieldErrors.ville} /></label>
-        <label>Établissement<input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
+        <label><span>Ville de résidence <RequiredMark /></span><input name="ville" required placeholder="Ex. : Kénitra" aria-invalid={Boolean(fieldErrors.ville)} aria-describedby={fieldErrors.ville ? "ville-error" : undefined} /><FieldError name="ville" message={fieldErrors.ville} /></label>
+        <label><span>Établissement <RequiredMark /></span><input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
       </div>
-      <label>Expérience MUN<select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
+      <label><span>Expérience MUN <RequiredMark /></span><select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
       <div className="form-row committee-choices">
         {[0, 1, 2].map(index => {
           const fieldName = `comite_choix_${index + 1}`;
           const required = committeeCount > index;
-          return <label key={fieldName}>{["Premier", "Deuxième", "Troisième"][index]} choix de comité<select name={fieldName} value={committeeChoices[index]} required={required} disabled={!committeeCount} onChange={event => chooseCommittee(index, event.target.value)} aria-invalid={Boolean(fieldErrors[fieldName])} aria-describedby={fieldErrors[fieldName] ? `${fieldName}-error` : undefined}><option value="">{committeeCount ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{committeeOptions(committeeChoices[index])}</select><FieldError name={fieldName} message={fieldErrors[fieldName]} /></label>;
+          return <label key={fieldName}><span>{["Premier", "Deuxième", "Troisième"][index]} choix de comité {required && <RequiredMark />}</span><select name={fieldName} value={committeeChoices[index]} required={required} disabled={!committeeCount} onChange={event => chooseCommittee(index, event.target.value)} aria-invalid={Boolean(fieldErrors[fieldName])} aria-describedby={fieldErrors[fieldName] ? `${fieldName}-error` : undefined}><option value="">{committeeCount ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{committeeOptions(committeeChoices[index])}</select><FieldError name={fieldName} message={fieldErrors[fieldName]} /></label>;
         })}
       </div>
-      <label>Votre pack<select name="pack" id="pack-select" required value={pack} onChange={(event) => onChoosePack(event.target.value)} aria-invalid={Boolean(fieldErrors.pack)} aria-describedby={fieldErrors.pack ? "pack-error" : undefined}><option value="">Choisir votre expérience</option><option value="550">Pack délégué — 550 DH</option><option value="1550">Pack avec hôtel — 1 550 DH</option></select><FieldError name="pack" message={fieldErrors.pack} /></label>
+      <label><span>Votre pack <RequiredMark /></span><select name="pack" id="pack-select" required value={pack} onChange={(event) => onChoosePack(event.target.value)} aria-invalid={Boolean(fieldErrors.pack)} aria-describedby={fieldErrors.pack ? "pack-error" : undefined}><option value="">Choisir votre expérience</option><option value="550">Pack délégué — 550 DH</option><option value="1550">Pack avec hôtel — 1 550 DH</option></select><FieldError name="pack" message={fieldErrors.pack} /></label>
       <label>Pourquoi souhaitez-vous participer au Alpha MUN et qu’espérez-vous tirer de cette expérience ?<textarea name="motivation" placeholder="Votre réponse (facultatif)" rows="5" /></label>
-      <label className="checkbox"><input type="checkbox" name="confirmation_pack" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.confirmation_pack)} aria-describedby={fieldErrors.confirmation_pack ? "confirmation_pack-error" : undefined} /><span>Je reconnais avoir choisi ce pack et j’en assume les conditions.</span><FieldError name="confirmation_pack" message={fieldErrors.confirmation_pack} /></label>
-      <label className="checkbox"><input type="checkbox" name="consentement" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.consentement)} aria-describedby={fieldErrors.consentement ? "consentement-error" : undefined} /><span>J’accepte que le YouthGlobalClub utilise ces informations pour traiter mon inscription et me contacter à propos de l’événement.</span><FieldError name="consentement" message={fieldErrors.consentement} /></label>
+      <label className="checkbox"><input type="checkbox" name="confirmation_pack" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.confirmation_pack)} aria-describedby={fieldErrors.confirmation_pack ? "confirmation_pack-error" : undefined} /><span>Je reconnais avoir choisi ce pack et j’en assume les conditions. <RequiredMark /></span><FieldError name="confirmation_pack" message={fieldErrors.confirmation_pack} /></label>
+      <label className="checkbox"><input type="checkbox" name="consentement" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.consentement)} aria-describedby={fieldErrors.consentement ? "consentement-error" : undefined} /><span>J’accepte que le YouthGlobalClub utilise ces informations pour traiter mon inscription et me contacter à propos de l’événement. <RequiredMark /></span><FieldError name="consentement" message={fieldErrors.consentement} /></label>
       <button className="button" type="submit" disabled={pending}>{pending ? "Envoi en cours\u2026" : "Envoyer mon inscription"} <ArrowUpRight /></button>
       <p id="form-status" role="status" aria-live="polite">{status}</p>
     </form>
