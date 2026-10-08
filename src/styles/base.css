@@ -675,6 +675,11 @@ textarea {
   line-height: 1.8;
 }
 
+.checkbox span {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .checkbox .field-error {
   flex-basis: 100%;
   margin-left: 28px;

@@ -1,98 +1,279 @@
-// Lier au Sheets cible, ou définir SPREADSHEET_ID dans les propriétés du script.
-// Redéployer une nouvelle version après modification de ce fichier.
+const REGISTRATION_HEADERS = [
+  'Date',
+  'Prénom',
+  'Nom',
+  'Email',
+  'Établissement',
+  'Expérience MUN',
+  'Comité',
+  'Pack DH',
+  'Ville',
+  'Pack assumé',
+  'Comité — choix 1',
+  'Comité — choix 2',
+  'Comité — choix 3',
+  'Motivation'
+];
+
 function doGet() {
-  // Vérification du déploiement uniquement, sans accès aux inscriptions.
-  return registrationJson_({ ok: true, service: 'alpha-mun-registration', version: '2' });
+  // Vérifie le déploiement sans modifier le fichier.
+  return registrationJson_({
+    ok: true,
+    service: 'alpha-mun-registration',
+    version: '4'
+  });
 }
+
 function registrationJson_(result) {
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
 }
+
+function registrationSpreadsheet_() {
+  const id = PropertiesService
+    .getScriptProperties()
+    .getProperty('SPREADSHEET_ID');
+
+  const spreadsheet = id && id.trim()
+    ? SpreadsheetApp.openById(id.trim())
+    : SpreadsheetApp.getActiveSpreadsheet();
+
+  if (!spreadsheet) {
+    throw new Error('Configurez la propriété SPREADSHEET_ID.');
+  }
+
+  return spreadsheet;
+}
+
+function registrationHeaders_(sheet) {
+  const count = sheet.getLastColumn();
+
+  return count > 0
+    ? sheet.getRange(1, 1, 1, count).getValues()[0]
+        .map(header => String(header).trim())
+    : [];
+}
+
+function registrationSheet_(spreadsheet) {
+  const sheet = spreadsheet.getSheetByName('Inscriptions')
+    || spreadsheet.insertSheet('Inscriptions');
+
+  let headers = registrationHeaders_(sheet);
+
+  // Refuser les titres en double pour éviter une écriture ambiguë.
+  const namedHeaders = headers.filter(Boolean);
+  if (new Set(namedHeaders).size !== namedHeaders.length) {
+    throw new Error('La ligne des titres contient des doublons.');
+  }
+
+  // Ajouter les titres manquants sans écraser les données.
+  for (const header of REGISTRATION_HEADERS) {
+    if (!headers.includes(header)) {
+      headers.push(header);
+      const column = headers.length;
+
+      if (column > sheet.getMaxColumns()) {
+        sheet.insertColumnsAfter(
+          sheet.getMaxColumns(),
+          column - sheet.getMaxColumns()
+        );
+      }
+
+      sheet.getRange(1, column).setValue(header);
+    }
+  }
+
+  // Déplacer toute la colonne Motivation après les autres.
+  // Les valeurs existantes se déplacent avec la colonne.
+  headers = registrationHeaders_(sheet);
+  const motivationColumn = headers.indexOf('Motivation') + 1;
+  const lastColumn = sheet.getLastColumn();
+
+  if (motivationColumn > 0 && motivationColumn < lastColumn) {
+    // Créer une position de destination après la dernière colonne.
+    if (sheet.getMaxColumns() < lastColumn + 1) {
+      sheet.insertColumnAfter(sheet.getMaxColumns());
+    }
+
+    sheet.moveColumns(
+      sheet.getRange(1, motivationColumn, sheet.getMaxRows(), 1),
+      lastColumn + 1
+    );
+  }
+
+  return sheet;
+}
+
+function registrationSafe_(input) {
+  const text = String(input == null ? '' : input).trim();
+  return /^[=+@\-]/.test(text) ? "'" + text : text;
+}
+
+// À sélectionner puis exécuter manuellement dans Apps Script.
+// Cette fonction ne crée aucune inscription.
+function preparerColonnes() {
+  const lock = LockService.getScriptLock();
+  let locked = false;
+
+  try {
+    lock.waitLock(10000);
+    locked = true;
+
+    const spreadsheet = registrationSpreadsheet_();
+    registrationSheet_(spreadsheet);
+
+    SpreadsheetApp.flush();
+    console.log('Colonnes préparées : ' + spreadsheet.getUrl());
+  } finally {
+    if (locked) lock.releaseLock();
+  }
+}
+
+// Appelée par le formulaire du site, pas par le bouton Exécuter.
 function doPost(e) {
   const requestId = Utilities.getUuid();
   const lock = LockService.getScriptLock();
   let locked = false;
   let phase = 'validation';
+
   try {
-    const p = e && e.parameter || {};
-    const required = ['nom', 'prenom', 'email', 'etablissement', 'ville', 'experience', 'confirmation_pack'];
-    const missing = required.filter(field => !String(p[field] || '').trim());
-    const committeeChoices = ['comite_choix_1', 'comite_choix_2', 'comite_choix_3']
-      .map(field => String(p[field] || '').trim())
-      .filter(Boolean);
-    const duplicateChoices = new Set(committeeChoices).size !== committeeChoices.length;
-    if (duplicateChoices) {
-      console.warn(JSON.stringify({ requestId, phase, code: 'DUPLICATE_COMMITTEE_CHOICES' }));
-      return registrationJson_({ ok: false, code: 'DUPLICATE_COMMITTEE_CHOICES', requestId });
+    const parameters = (e && e.parameter) || {};
+    const value = field => String(parameters[field] || '').trim();
+
+    const required = [
+      'prenom',
+      'nom',
+      'email',
+      'etablissement',
+      'ville',
+      'experience',
+      'confirmation_pack'
+    ];
+
+    const missing = required.filter(field => !value(field));
+
+    if (
+      missing.length > 0 ||
+      !['550', '1550'].includes(value('pack')) ||
+      value('type') !== 'registration'
+    ) {
+      return registrationJson_({
+        ok: false,
+        code: 'INVALID_FIELDS',
+        missing,
+        requestId
+      });
     }
-    if (missing.length || !['550', '1550'].includes(p.pack) || p.type !== 'registration') {
-      console.warn(JSON.stringify({ requestId, phase, code: 'INVALID_FIELDS', missing }));
-      return registrationJson_({ ok: false, code: 'INVALID_FIELDS', requestId });
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value('email'))) {
+      return registrationJson_({
+        ok: false,
+        code: 'INVALID_EMAIL',
+        requestId
+      });
     }
+
+    const choices = [
+      value('comite_choix_1') || value('comite'),
+      value('comite_choix_2'),
+      value('comite_choix_3')
+    ];
+
+    const selected = choices
+      .filter(Boolean)
+      .map(choice => choice.toLocaleLowerCase());
+
+    if (new Set(selected).size !== selected.length) {
+      return registrationJson_({
+        ok: false,
+        code: 'DUPLICATE_COMMITTEE_CHOICES',
+        requestId
+      });
+    }
+
+    // Les choix vides sont acceptés.
+    // Le site gère les choix obligatoires après leur annonce.
+
     phase = 'lock';
     lock.waitLock(10000);
     locked = true;
+
     phase = 'spreadsheet';
-    const spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
-    const spreadsheet = spreadsheetId
-      ? SpreadsheetApp.openById(spreadsheetId.trim())
-      : SpreadsheetApp.getActiveSpreadsheet();
-    if (!spreadsheet) {
-      console.error(JSON.stringify({ requestId, phase, code: 'SPREADSHEET_NOT_CONFIGURED' }));
-      return registrationJson_({ ok: false, code: 'SPREADSHEET_NOT_CONFIGURED', requestId });
-    }
-    phase = 'sheet';
-    let sheet = spreadsheet.getSheetByName('Inscriptions');
-    let cityColumn;
-    let motivationColumn;
-    let packConfirmationColumn;
-    let committeeChoiceColumns;
-    if (!sheet) {
-      sheet = spreadsheet.insertSheet('Inscriptions');
-      sheet.appendRow(['Date', 'Prénom', 'Nom', 'Email', 'Établissement', 'Expérience MUN', 'Comité', 'Pack DH', 'Ville', 'Motivation', 'Pack assumé', 'Comité — choix 1', 'Comité — choix 2', 'Comité — choix 3']);
-      cityColumn = 9;
-      motivationColumn = 10;
-      packConfirmationColumn = 11;
-      committeeChoiceColumns = [12, 13, 14];
-    } else {
-      const lastColumn = sheet.getLastColumn();
-      const headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
-      let nextColumn = lastColumn + 1;
-      const ensureColumn = header => {
-        const existingColumn = headers.indexOf(header);
-        if (existingColumn >= 0) return existingColumn + 1;
-        const column = nextColumn++;
-        sheet.getRange(1, column).setValue(header);
-        headers.push(header);
-        return column;
-      };
-      cityColumn = ensureColumn('Ville');
-      motivationColumn = ensureColumn('Motivation');
-      packConfirmationColumn = ensureColumn('Pack assumé');
-      committeeChoiceColumns = [
-        ensureColumn('Comité — choix 1'),
-        ensureColumn('Comité — choix 2'),
-        ensureColumn('Comité — choix 3'),
-      ];
-    }
-    sheet.getRange('A:A').setNumberFormat('dd/MM/yyyy HH:mm:ss');
-    const safe = value => /^[=+@\-]/.test(String(value || '')) ? "'" + value : String(value || '');
+    const spreadsheet = registrationSpreadsheet_();
+
+    phase = 'headers';
+    const sheet = registrationSheet_(spreadsheet);
+    const headers = registrationHeaders_(sheet);
+    const safe = registrationSafe_;
+
+    const data = {
+      'Date': new Date(),
+      'Prénom': safe(value('prenom')),
+      'Nom': safe(value('nom')),
+      'Email': safe(value('email')),
+      'Établissement': safe(value('etablissement')),
+      'Expérience MUN': safe(value('experience')),
+      'Comité': safe(choices[0]),
+      'Pack DH': safe(value('pack')),
+      'Ville': safe(value('ville')),
+      'Pack assumé': safe(value('confirmation_pack')),
+      'Comité — choix 1': safe(choices[0]),
+      'Comité — choix 2': safe(choices[1]),
+      'Comité — choix 3': safe(choices[2]),
+      'Motivation': safe(value('motivation'))
+    };
+
+    // Suivre l'ordre réel des colonnes dans Google Sheets.
+    const row = headers.map(header =>
+      Object.prototype.hasOwnProperty.call(data, header)
+        ? data[header]
+        : ''
+    );
+
     phase = 'append';
-    const row = [new Date(), ...[p.prenom, p.nom, p.email, p.etablissement, p.experience, p.comite, p.pack].map(safe)];
-    row[cityColumn - 1] = safe(p.ville);
-    row[motivationColumn - 1] = safe(p.motivation);
-    row[packConfirmationColumn - 1] = safe(p.confirmation_pack);
-    committeeChoiceColumns.forEach((column, index) => {
-      row[column - 1] = safe(p[`comite_choix_${index + 1}`]);
-    });
-    sheet.appendRow(row);
+    const nextRow = Math.max(sheet.getLastRow() + 1, 2);
+
+    if (nextRow > sheet.getMaxRows()) {
+      sheet.insertRowsAfter(
+        sheet.getMaxRows(),
+        nextRow - sheet.getMaxRows()
+      );
+    }
+
+    sheet.getRange(nextRow, 1, 1, row.length).setValues([row]);
+
+    const dateColumn = headers.indexOf('Date') + 1;
+    sheet.getRange(nextRow, dateColumn)
+      .setNumberFormat('dd/MM/yyyy HH:mm:ss');
+
     phase = 'flush';
     SpreadsheetApp.flush();
-    console.info(JSON.stringify({ requestId, phase: 'complete', code: 'REGISTRATION_SAVED' }));
-    return registrationJson_({ ok: true, requestId });
-  } catch (err) {
-    // Do not log the submitted form or return internal details publicly.
-    console.error(JSON.stringify({ requestId, phase, code: 'SCRIPT_ERROR', message: String(err.message || err), stack: String(err.stack || '') }));
-    return registrationJson_({ ok: false, code: 'SCRIPT_ERROR', requestId });
+
+    console.info(JSON.stringify({
+      requestId,
+      code: 'REGISTRATION_SAVED'
+    }));
+
+    return registrationJson_({
+      ok: true,
+      requestId
+    });
+
+  } catch (error) {
+    console.error(JSON.stringify({
+      requestId,
+      phase,
+      code: 'SCRIPT_ERROR',
+      message: String(error.message || error)
+    }));
+
+    return registrationJson_({
+      ok: false,
+      code: 'SCRIPT_ERROR',
+      requestId
+    });
+
   } finally {
     if (locked) lock.releaseLock();
   }
