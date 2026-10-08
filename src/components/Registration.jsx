@@ -34,6 +34,7 @@ function Registration({ pack, onChoosePack }) {
     if (sending.current) return;
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form));
+    data.ville = data.ville.trim();
     sending.current = true;
     setPending(true);
     setStatus("Envoi en cours\u2026");
@@ -71,6 +72,7 @@ function Registration({ pack, onChoosePack }) {
           <div><dt>Prénom</dt><dd>{confirmation.prenom}</dd></div>
           <div><dt>Nom</dt><dd>{confirmation.nom}</dd></div>
           <div><dt>E-mail</dt><dd>{confirmation.email}</dd></div>
+          <div><dt>Ville</dt><dd>{confirmation.ville}</dd></div>
           <div><dt>Pack</dt><dd>{packLabels[confirmation.pack] || confirmation.pack}</dd></div>
         </dl>
         <a className="button outline" href="#accueil">Retour à l’accueil <ArrowUpRight /></a>
@@ -91,12 +93,17 @@ function Registration({ pack, onChoosePack }) {
         <label>Nom<input name="nom" required autoComplete="family-name" placeholder="Votre nom" aria-invalid={Boolean(fieldErrors.nom)} aria-describedby={fieldErrors.nom ? "nom-error" : undefined} /><FieldError name="nom" message={fieldErrors.nom} /></label>
       </div>
       <label>E-mail<input name="email" type="email" required autoComplete="email" placeholder="vous@exemple.com" aria-invalid={Boolean(fieldErrors.email)} aria-describedby={fieldErrors.email ? "email-error" : undefined} /><FieldError name="email" message={fieldErrors.email} /></label>
-      <label>Établissement<input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
+      <div className="form-row school-row">
+        <label>Ville de résidence<input name="ville" required placeholder="Ex. : Kénitra" aria-invalid={Boolean(fieldErrors.ville)} aria-describedby={fieldErrors.ville ? "ville-error" : undefined} /><FieldError name="ville" message={fieldErrors.ville} /></label>
+        <label>Établissement<input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
+      </div>
       <div className="form-row">
-        <label>Expérience MUN<select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 2 participations</option><option>3 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
+        <label>Expérience MUN<select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
         <label>Comité souhaité<select name="comite" id="committee-select" required={config.committees.length > 0} aria-invalid={Boolean(fieldErrors.comite)} aria-describedby={fieldErrors.comite ? "comite-error" : undefined}><option value="">{config.committees.length ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{config.committees.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}</select><FieldError name="comite" message={fieldErrors.comite} /></label>
       </div>
       <label>Votre pack<select name="pack" id="pack-select" required value={pack} onChange={(event) => onChoosePack(event.target.value)} aria-invalid={Boolean(fieldErrors.pack)} aria-describedby={fieldErrors.pack ? "pack-error" : undefined}><option value="">Choisir votre expérience</option><option value="550">Pack délégué — 550 DH</option><option value="1550">Pack avec hôtel — 1 550 DH</option></select><FieldError name="pack" message={fieldErrors.pack} /></label>
+      <label>Why do you want to participate in Alpha MUN, and what do you hope to gain from this experience? | Pourquoi souhaitez-vous participer au Alpha MUN et qu’espérez-vous tirer de cette expérience ?<textarea name="motivation" placeholder="Votre réponse (facultatif)" rows="5" /></label>
+      <label className="checkbox"><input type="checkbox" name="confirmation_pack" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.confirmation_pack)} aria-describedby={fieldErrors.confirmation_pack ? "confirmation_pack-error" : undefined} /><span>Je reconnais avoir choisi ce pack et j’en assume les conditions.</span><FieldError name="confirmation_pack" message={fieldErrors.confirmation_pack} /></label>
       <label className="checkbox"><input type="checkbox" name="consentement" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.consentement)} aria-describedby={fieldErrors.consentement ? "consentement-error" : undefined} /><span>J’accepte que le YouthGlobalClub utilise ces informations pour traiter mon inscription et me contacter à propos de l’événement.</span><FieldError name="consentement" message={fieldErrors.consentement} /></label>
       <button className="button" type="submit" disabled={pending}>{pending ? "Envoi en cours\u2026" : "Envoyer mon inscription"} <ArrowUpRight /></button>
       <p id="form-status" role="status" aria-live="polite">{status}</p>

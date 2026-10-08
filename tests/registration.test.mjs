@@ -7,7 +7,7 @@ const endpoint = 'https://script.google.com/macros/s/test/exec';
 const source = (await fs.readFile(new URL('../src/services/registration.js', import.meta.url), 'utf8'))
   .replace("import { config } from '../config';", `const config = { appsScriptUrl: ${JSON.stringify(endpoint)} };`);
 const { submitRegistration } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
-const data = { nom: 'Test', prenom: 'Alpha', email: 'test@example.com', etablissement: 'Test', experience: 'Première participation', comite: '', pack: '550' };
+const data = { nom: 'Test', prenom: 'Alpha', email: 'test@example.com', etablissement: 'Test', ville: 'Kénitra', experience: 'Première participation', comite: '', pack: '550', motivation: 'Découvrir la diplomatie.', confirmation_pack: 'on' };
 test('POST form contains all required fields and follows redirects once', async () => {
   const original = globalThis.fetch;
   let calls = 0;
@@ -55,9 +55,14 @@ function scriptContext({ id = '', active = null, failLock = false, failWrite = f
   let releases = 0, openedId;
   const sheet = {
     appendRow(row) { if (failWrite) throw Error('Write failed'); rows.push(row); },
-    getRange(range) {
-      assert.equal(range, 'A:A');
-      return { setNumberFormat(format) { assert.equal(format, 'dd/MM/yyyy HH:mm:ss'); } };
+    getLastColumn() { return 8; },
+    getRange(...args) {
+      if (args[0] === 'A:A') return { setNumberFormat(format) { assert.equal(format, 'dd/MM/yyyy HH:mm:ss'); } };
+      if (args.length === 4) assert.equal(args.join(','), '1,1,1,8');
+      if (args.length === 2) return { setValue(value) { assert.ok(['Ville', 'Motivation', 'Pack assumé'].includes(value)); } };
+      return {
+        getValues() { return [['Date', 'Prénom', 'Nom', 'Email', 'Établissement', 'Expérience MUN', 'Comité', 'Pack DH']]; },
+      };
     },
   };
   const spreadsheet = { getSheetByName: () => sheet };
@@ -90,6 +95,8 @@ test('explicit spreadsheet ID saves once and logs no form values', () => {
   assert.equal(state.openedId(), 'target-id');
   assert.equal(state.rows.length, 1);
   assert.equal(state.rows[0][3], data.email);
+  assert.equal(state.rows[0][8], data.ville);
+  assert.equal(state.rows[0][10], data.confirmation_pack);
   assert.equal(state.logs[0].code, 'REGISTRATION_SAVED');
   assert.ok(!JSON.stringify(state.logs).includes(data.email));
 });

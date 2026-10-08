@@ -21,7 +21,7 @@ export async function submitRegistration(data) {
     throw new RegistrationError('CONFIGURATION', 'L’adresse Apps Script doit être celle du déploiement public et terminer par /exec.');
   }
   const body = new URLSearchParams();
-  for (const field of ['nom', 'prenom', 'email', 'etablissement', 'experience', 'comite', 'pack']) {
+  for (const field of ['nom', 'prenom', 'email', 'etablissement', 'ville', 'experience', 'comite', 'pack', 'motivation', 'confirmation_pack']) {
     body.set(field, data[field] ?? '');
   }
   body.set('type', 'registration');
