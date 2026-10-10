@@ -1,3 +1,5 @@
+> Mise a jour : consulter [integration/MISE-A-JOUR.md](integration/MISE-A-JOUR.md). Le formulaire utilise maintenant une Pages Function ; un upload statique seul ne suffit plus. Les instructions historiques ci-dessous ne remplacent pas cette procedure.
+
 # Préparation de youthglobalclub.com
 
 Le site utilise React et Vite. Il se déploie comme un site statique à la racine du domaine : `index.html` et `assets/`. Aucun serveur Node.js ni base de données ne sont nécessaires pour servir cette compilation. Les inscriptions sont envoyées à l'application Web Google Apps Script existante.

@@ -1,3 +1,5 @@
+﻿import { ArrowUpRight } from './icons';
+
 import { useState } from "react";
 import { config } from "../config";
 function Contact() {
@@ -24,4 +26,6 @@ function Contact() {
 export {
   Contact as default
 };
-import { ArrowUpRight } from './icons';
+
+
+

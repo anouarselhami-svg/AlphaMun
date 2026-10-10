@@ -1,148 +1,22 @@
-import { useRef, useState } from "react";
-import { config } from "../config";
-import { RegistrationError, submitRegistration } from "../services/registration";
-import { ArrowUpRight } from "./icons";
-
-const packLabels = {
-  "550": "Pack délégué — 550 DH",
-  "1550": "Pack avec hôtel — 1 550 DH",
-};
-
-function FieldError({ name, message }) {
-  return message ? <span className="field-error" id={`${name}-error`} role="alert">{message}</span> : null;
+﻿import { useRef, useState } from 'react';
+import { config } from '../config';
+import { submitRegistration } from '../services/registration';
+const initial = {prenom:'',nom:'',email:'',age:'',telephone:'',contact_parent:'',etablissement:'',niveau:'',ville:'',langue_comite:'',comite_choix_1:'',comite_choix_2:'',comite_choix_3:'',confirmation_pack:false,experience:'',experience_details:'',motivation_comite:'',attentes:'',hebergement:'',restrictions_alimentaires:'',besoins_particuliers:'',code_conduite:false,exactitude:false,consentement:false,motivation:''};
+export default function Registration({pack,onChoosePack}) {
+ const [language,setLanguage]=useState(localStorage.getItem('amun-language') || 'fr');
+ const t=(fr,en)=>language==='en'?en:fr;
+ const [data,setData]=useState({...initial,pack:['500','1500'].includes(pack)?pack:''});
+ const [step,setStep]=useState(0),[errors,setErrors]=useState({}),[pending,setPending]=useState(false),[status,setStatus]=useState(''),[saved,setSaved]=useState(null);
+ const sending=useRef(false),title=useRef(null);
+ const update=(name,value)=>{setData(d=>({...d,[name]:value,...(name==='pack'?{confirmation_pack:false}:{})}));setErrors(e=>({...e,[name]:''}));if(name==='pack')onChoosePack(value);};
+ const packName=v=>v==='1500'?t('Pack avec hôtel — 1 500 MAD','Hotel package — 1,500 MAD'):v==='500'?t('Pack délégué — 500 MAD','Delegate package — 500 MAD'):t('Aucun pack choisi','No package selected');
+ const steps=[t('Informations personnelles','Personal information'),t('Pack et préférences','Package and preferences'),t('Expérience et motivation','Experience and motivation'),t('Besoins et validation','Needs and review')];
+ const groups=[['prenom','nom','email','age','telephone','etablissement','niveau','ville'],['pack','langue_comite','confirmation_pack'],['experience','attentes'],['hebergement','code_conduite','exactitude','consentement']];
+ function validate(index){const required=[...groups[index]];if(index===0&&Number(data.age)<18)required.push('contact_parent');if(index===1){if(!config.committeeLanguages.length)required.splice(required.indexOf('langue_comite'),1);for(let i=1;i<=Math.min(3,config.committees.length);i++)required.push(`comite_choix_${i}`);}if(index===2&&data.comite_choix_1)required.push('motivation_comite');const next={};for(const name of required)if(!data[name]||typeof data[name]==='string'&&!data[name].trim())next[name]=t('Ce champ est obligatoire.','This field is required.');if(index===0){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))next.email=t('Adresse e-mail invalide.','Invalid email address.');if(!/^\d+$/.test(data.age)||!Number.isSafeInteger(Number(data.age))||Number(data.age)<=0)next.age=t('Saisissez un entier positif.','Enter a positive integer.');for(const n of ['telephone',...(data.contact_parent?['contact_parent']:[])])if(!/^\+?[\d\s().-]+$/.test(data[n])||data[n].replace(/\D/g,'').length<7||data[n].replace(/\D/g,'').length>15)next[n]=t('Saisissez un numéro international valide.','Enter a valid international phone number.');}if(index===1&&!['500','1500'].includes(data.pack))next.pack=t('Choisissez un pack.','Select a package.');setErrors(next);return !Object.keys(next).length;}
+ function move(index){setStep(index);setErrors({});requestAnimationFrame(()=>title.current?.focus());}
+ async function submit(e){e.preventDefault();if(sending.current)return;for(let i=0;i<4;i++)if(!validate(i)){setStep(i);return;}const payload=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,typeof v==='boolean'?(v?'on':''):v.trim()]));sending.current=true;setPending(true);setStatus(t('Envoi de votre inscription…','Sending your registration…'));try{await submitRegistration(payload);setSaved(payload);setStatus('');}catch(error){setStatus(t('L’enregistrement n’a pas pu être confirmé. Vos réponses sont conservées. Vous pouvez réessayer.','Registration could not be confirmed. Your answers are preserved; you can try again.')+' '+error.message);}finally{sending.current=false;setPending(false);}}
+ function field(name,label,{type='text',required=false,options=null,long=false,help=''}={}){const props={id:name,name,value:data[name],onChange:e=>update(name,e.target.value),'aria-invalid':!!errors[name],'aria-describedby':[help?name+'-help':'',errors[name]?name+'-error':''].filter(Boolean).join(' ')||undefined,required};return <label className={long?'wide':''} key={name} htmlFor={name}><span>{label}{required?' *':''}</span>{options?<select {...props}><option value="">{t('Sélectionner','Select')}</option>{options.map(([v,l])=><option key={v} value={v} disabled={name.startsWith('comite_')&&[1,2,3].some(i=>`comite_choix_${i}`!==name&&data[`comite_choix_${i}`]===v)}>{l}</option>)}</select>:long?<textarea {...props} rows={4}/>:<input {...props} type={type} autoComplete={({prenom:'given-name',nom:'family-name',email:'email',telephone:'tel',ville:'address-level2'})[name]} inputMode={name==='age'?'numeric':undefined}/>} {help&&<small id={name+'-help'}>{help}</small>}{errors[name]&&<span className="field-error" id={name+'-error'} role="alert">{errors[name]}</span>}</label>;}
+ function check(name,label){return <label className="checkbox wide" key={name}><input type="checkbox" checked={data[name]} onChange={e=>update(name,e.target.checked)} required aria-invalid={!!errors[name]} aria-describedby={errors[name]?name+'-error':undefined}/><span>{label} *</span>{errors[name]&&<span className="field-error" id={name+'-error'}>{errors[name]}</span>}</label>;}
+ function recap(d){return <dl className="registration-recap"><div><dt>{t('Nom','Name')}</dt><dd>{d.prenom} {d.nom}</dd></div><div><dt>Pack</dt><dd>{packName(d.pack)}</dd></div><div><dt>{t('Ville','City')}</dt><dd>{d.ville}</dd></div><div><dt>{t('Préférences de comités','Committee preferences')}</dt><dd>{[1,2,3].map(i=>d[`comite_choix_${i}`]).filter(Boolean).join(' / ')||t('En attente de l’annonce','Awaiting announcement')}</dd></div></dl>;}
+ return <section className="section registration registration-page" id="inscription"><div className="registration-intro"><div className="language-switch" aria-label="Language">{['fr','en'].map(l=><button key={l} type="button" aria-pressed={language===l} onClick={()=>{setLanguage(l);localStorage.setItem('amun-language',l);}}>{l.toUpperCase()}</button>)}</div><p className="eyebrow">ALPHA MUN 8</p><h1>{t('Inscription délégué','Delegate registration')}</h1><p>{t('Vos informations seront transmises au YouthGlobalClub pour le suivi de votre inscription.','Your information will be sent to YouthGlobalClub to process your registration.')}</p></div>{saved?<div><h2>{t('Merci pour votre inscription à Alpha MUN 8. Votre réponse a bien été enregistrée.','Thank you for registering for Alpha MUN 8. Your response has been recorded.')}</h2>{recap(saved)}<p>{t('Cet enregistrement ne confirme ni le paiement ni l’admission. Les préférences ne garantissent pas l’affectation.','This record does not confirm payment or admission. Preferences do not guarantee assignment.')}</p><a className="button" href="/">{t('Retour à l’accueil','Back to home')}</a></div>:<><ol className="registration-progress">{steps.map((s,i)=><li key={s} aria-current={i===step?'step':undefined}><span>{i+1}</span>{s}</li>)}</ol><div className="selected-pack"><strong>{packName(data.pack)}</strong><button type="button" disabled={pending} onClick={()=>move(1)}>{t('Changer de pack','Change package')}</button></div><form noValidate onSubmit={submit}><fieldset disabled={pending}><legend ref={title} tabIndex={-1}>{step+1} / 4 — {steps[step]}</legend><div className="registration-fields">{step===0&&<>{field('prenom',t('Prénom','First name'),{required:true})}{field('nom',t('Nom','Last name'),{required:true})}{field('email','Email',{type:'email',required:true})}{field('age',t('Âge','Age'),{required:true})}{field('telephone',t('Téléphone','Phone'),{type:'tel',required:true})}{field('contact_parent',t('Contact d’un parent ou tuteur','Parent or guardian phone'),{type:'tel',required:!!data.age&&Number(data.age)<18,help:t('Obligatoire pour les moins de 18 ans, facultatif sinon.','Required under age 18; optional otherwise.')})}{field('etablissement',t('Établissement','School / institution'),{required:true})}{field('niveau',t('Niveau scolaire ou classe','Grade / education level'),{required:true})}{field('ville',t('Ville','City'),{required:true})}</>}{step===1&&<>{field('pack',t('Pack choisi','Selected package'),{required:true,options:['500','1500'].map(v=>[v,packName(v)])})}{config.committeeLanguages.length?field('langue_comite',t('Langue des comités','Committee language'),{required:true,options:config.committeeLanguages.map(v=>[v,v])}):<p className="wide notice">{t('Les langues des comités seront annoncées. Vous pouvez poursuivre sans préférence de langue.','Committee languages will be announced. You can continue without a language preference.')}</p>}{config.committees.length?[1,2,3].slice(0,Math.min(3,config.committees.length)).map(i=>field(`comite_choix_${i}`,t(`Comité — choix ${i}`,`Committee — choice ${i}`),{required:true,options:config.committees.map(c=>[c.name,c.name])})):<p className="wide notice">{t('Les comités ne sont pas encore annoncés. Vous pouvez poursuivre sans ces choix.','Committees have not been announced yet. You can continue without these choices.')}</p>}<p className="wide">{t('Ces choix expriment vos préférences et ne garantissent pas l’affectation.','These choices express preferences and do not guarantee assignment.')}</p>{check('confirmation_pack',t(`Je confirme le pack choisi et son tarif : ${packName(data.pack)}.`,`I confirm my selected package and its price: ${packName(data.pack)}.`))}</>}{step===2&&<>{field('experience',t('Avez-vous déjà participé à un MUN ?','Have you participated in a MUN before?'),{required:true,options:[['oui',t('Oui','Yes')],['non',t('Non','No')]]})}{data.experience==='oui'&&field('experience_details',t('Décrivez votre expérience MUN : postes, distinctions…','Describe your MUN experience: roles, awards…'),{long:true})}{data.comite_choix_1&&field('motivation_comite',t('Pourquoi souhaitez-vous rejoindre votre comité de premier choix ?','Why would you like to join your first-choice committee?'),{long:true,required:true})}{field('attentes',t('Qu’espérez-vous tirer de cette expérience ?','What do you hope to gain from this experience?'),{long:true,required:true})}</>}{step===3&&<>{field('hebergement',t('Aurez-vous besoin d’un hébergement ?','Will you need accommodation?'),{required:true,options:[['oui',t('Oui','Yes')],['non',t('Non','No')],['a_confirmer',t('À confirmer','To be confirmed')]]})}{field('restrictions_alimentaires',t('Restrictions alimentaires (facultatif)','Dietary restrictions (optional)'),{long:true})}{field('besoins_particuliers',t('Autres besoins particuliers (facultatif)','Other needs (optional)'),{long:true})}<p className="wide notice">{t('Ces informations servent à l’organisation et ne constituent pas une réservation ou une prise en charge garantie.','This information helps planning and does not guarantee a booking or support.')}</p>{check('code_conduite',t('J’accepte de me conformer aux règles et au code de conduite d’AMUN.','I agree to follow AMUN rules and code of conduct.'))}{check('exactitude',t('Je confirme que les informations fournies sont exactes.','I confirm the information provided is accurate.'))}{check('consentement',t('J’accepte l’utilisation de mes informations pour traiter mon inscription et me contacter.','I agree to the use of my information to process my registration and contact me.'))}{field('motivation',t('Motivation complémentaire (facultatif)','Additional motivation (optional)'),{long:true})}<div className="wide"><h3>{t('Récapitulatif avant envoi','Review before submitting')}</h3>{recap(data)}<dl className="registration-recap">{Object.entries({"email":["Email","Email"],"age":["Âge","Age"],"telephone":["Téléphone","Phone"],"contact_parent":["Contact parent / tuteur","Parent / guardian"],"etablissement":["Établissement","School"],"niveau":["Niveau scolaire","Grade"],"langue_comite":["Langue des comités","Committee language"],"experience":["Participation MUN antérieure","Previous MUN participation"],"experience_details":["Expérience MUN","MUN experience"],"motivation_comite":["Motivation du premier choix","First-choice motivation"],"attentes":["Attentes","Expectations"],"hebergement":["Hébergement","Accommodation need"],"restrictions_alimentaires":["Restrictions alimentaires","Dietary restrictions"],"besoins_particuliers":["Besoins particuliers","Other needs"],"confirmation_pack":["Pack et tarif confirmés","Package and price confirmed"],"code_conduite":["Code de conduite accepté","Code of conduct accepted"],"exactitude":["Informations exactes","Accurate information"],"consentement":["Consentement","Consent"],"motivation":["Motivation complémentaire","Additional motivation"]}).map(([name,label])=>data[name]?<div key={name}><dt>{t(...label)}</dt><dd>{data[name]===true?t("Oui","Yes"):data[name]}</dd></div>:null)}</dl>{steps.slice(0,3).map((s,i)=><button type="button" key={s} onClick={()=>move(i)}>{t('Modifier : ','Edit: ')}{s}</button>)}</div></>}</div><div className="registration-actions">{step>0&&<button type="button" className="button outline" onClick={()=>move(step-1)}>{t('Précédent','Previous')}</button>}{step<3?<button type="button" className="button" onClick={()=>{if(validate(step))move(step+1);}}>{t('Suivant','Next')}</button>:<button type="submit" className="button" disabled={pending}>{pending?t('Envoi de votre inscription…','Sending your registration…'):t('Envoyer mon inscription','Submit registration')}</button>}</div></fieldset><p role="status" aria-live="polite">{status}</p></form></>}</section>;
 }
-
-function RequiredMark() {
-  return <span className="required-mark" aria-hidden="true">*</span>;
-}
-
-function Registration({ pack, onChoosePack }) {
-  const [status, setStatus] = useState("");
-  const [pending, setPending] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [confirmation, setConfirmation] = useState(null);
-  const [committeeChoices, setCommitteeChoices] = useState(["", "", ""]);
-  const sending = useRef(false);
-  const committeeCount = config.committees.length;
-
-  function markInvalid(event) {
-    const field = event.target;
-    const message = field.validity.valueMissing
-      ? "Ce champ est obligatoire."
-      : field.validity.typeMismatch
-        ? "Saisissez une adresse e-mail valide."
-        : "Vérifiez cette valeur.";
-    setFieldErrors(previous => ({ ...previous, [field.name]: message }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (sending.current) return;
-    const form = event.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
-    data.ville = data.ville.trim();
-    data.comite = data.comite_choix_1 || "";
-    sending.current = true;
-    setPending(true);
-    setStatus("Envoi en cours\u2026");
-    setFieldErrors({});
-    try {
-      await submitRegistration(data);
-      setConfirmation(data);
-      setStatus("");
-      form.reset();
-      setCommitteeChoices(["", "", ""]);
-      onChoosePack("");
-    } catch (error) {
-      const reason = error instanceof RegistrationError
-        ? error.message
-        : "L’inscription n’a pas pu être confirmée.";
-      setStatus(`${reason} Vos données saisies sont conservées. Vous pouvez réessayer.`);
-      console.error("Alpha MUN — inscription", error instanceof RegistrationError
-        ? { code: error.code, ...error.diagnostics }
-        : { code: "UNEXPECTED_ERROR" });
-    } finally {
-      sending.current = false;
-      setPending(false);
-    }
-
-  }
-
-  function chooseCommittee(index, value) {
-    setCommitteeChoices(previous => previous.map((choice, choiceIndex) => (
-      choiceIndex !== index && choice === value ? "" : choiceIndex === index ? value : choice
-    )));
-    setFieldErrors(previous => ({ ...previous, [`comite_choix_${index + 1}`]: "" }));
-  }
-
-  function committeeOptions(selected) {
-    return config.committees.map(committee => (
-      <option
-        key={committee.name}
-        value={committee.name}
-        disabled={committeeChoices.includes(committee.name) && selected !== committee.name}
-      >
-        {committee.name}
-      </option>
-    ));
-  }
-
-  if (confirmation) {
-    return <section id="inscription" className="section registration registration-confirmation" aria-labelledby="registration-confirmed-title">
-      <div>
-        <p className="eyebrow">INSCRIPTION ENREGISTRÉE</p>
-        <h2 id="registration-confirmed-title">Ton inscription a bien été enregistrée.</h2>
-        <p>Le club vous contactera pour la suite. Cette confirmation ne constitue pas un paiement ni une validation définitive.</p>
-      </div>
-      <div className="confirmation-card">
-        <p className="eyebrow">RÉCAPITULATIF</p>
-        <dl>
-          <div><dt>Prénom</dt><dd>{confirmation.prenom}</dd></div>
-          <div><dt>Nom</dt><dd>{confirmation.nom}</dd></div>
-          <div><dt>E-mail</dt><dd>{confirmation.email}</dd></div>
-          <div><dt>Ville</dt><dd>{confirmation.ville}</dd></div>
-          {["comite_choix_1", "comite_choix_2", "comite_choix_3"].map((field, index) => confirmation[field] ? <div key={field}><dt>{["Premier", "Deuxième", "Troisième"][index]} choix de comité</dt><dd>{confirmation[field]}</dd></div> : null)}
-          <div><dt>Pack</dt><dd>{packLabels[confirmation.pack] || confirmation.pack}</dd></div>
-        </dl>
-        <p>Les choix expriment vos préférences et ne garantissent pas l’attribution d’un comité.</p>
-        <a className="button outline" href="#accueil">Retour à l’accueil <ArrowUpRight /></a>
-      </div>
-    </section>;
-  }
-
-  return <section id="inscription" className="section registration">
-    <div>
-      <p className="eyebrow">04 / PRENEZ VOTRE PLACE</p>
-      <h2>Le prochain<br />délégué,<br /><em>c’est vous.</em></h2>
-      <p>Faites le premier pas vers trois jours de rencontres et de diplomatie.</p>
-      <p className="notice" id="registration-note">Vos informations seront transmises au YouthGlobalClub pour le suivi de votre inscription.</p>
-    </div>
-    <form id="registration-form" onSubmit={handleSubmit} onInvalid={markInvalid}>
-      <div className="form-row">
-        <label><span>Prénom <RequiredMark /></span><input name="prenom" required autoComplete="given-name" placeholder="Votre prénom" aria-invalid={Boolean(fieldErrors.prenom)} aria-describedby={fieldErrors.prenom ? "prenom-error" : undefined} /><FieldError name="prenom" message={fieldErrors.prenom} /></label>
-        <label><span>Nom <RequiredMark /></span><input name="nom" required autoComplete="family-name" placeholder="Votre nom" aria-invalid={Boolean(fieldErrors.nom)} aria-describedby={fieldErrors.nom ? "nom-error" : undefined} /><FieldError name="nom" message={fieldErrors.nom} /></label>
-      </div>
-      <label><span>E-mail <RequiredMark /></span><input name="email" type="email" required autoComplete="email" placeholder="vous@exemple.com" aria-invalid={Boolean(fieldErrors.email)} aria-describedby={fieldErrors.email ? "email-error" : undefined} /><FieldError name="email" message={fieldErrors.email} /></label>
-      <div className="form-row school-row">
-        <label><span>Ville de résidence <RequiredMark /></span><input name="ville" required placeholder="Ex. : Kénitra" aria-invalid={Boolean(fieldErrors.ville)} aria-describedby={fieldErrors.ville ? "ville-error" : undefined} /><FieldError name="ville" message={fieldErrors.ville} /></label>
-        <label><span>Établissement <RequiredMark /></span><input name="etablissement" required placeholder="École, lycée ou université" aria-invalid={Boolean(fieldErrors.etablissement)} aria-describedby={fieldErrors.etablissement ? "etablissement-error" : undefined} /><FieldError name="etablissement" message={fieldErrors.etablissement} /></label>
-      </div>
-      <label><span>Expérience MUN <RequiredMark /></span><select name="experience" required aria-invalid={Boolean(fieldErrors.experience)} aria-describedby={fieldErrors.experience ? "experience-error" : undefined}><option value="">Sélectionner</option><option>Première participation</option><option>1 à 3 participations</option><option>5 participations ou plus</option></select><FieldError name="experience" message={fieldErrors.experience} /></label>
-      <div className="form-row committee-choices">
-        {[0, 1, 2].map(index => {
-          const fieldName = `comite_choix_${index + 1}`;
-          const required = committeeCount > index;
-          return <label key={fieldName}><span>{["Premier", "Deuxième", "Troisième"][index]} choix de comité {required && <RequiredMark />}</span><select name={fieldName} value={committeeChoices[index]} required={required} disabled={!committeeCount} onChange={event => chooseCommittee(index, event.target.value)} aria-invalid={Boolean(fieldErrors[fieldName])} aria-describedby={fieldErrors[fieldName] ? `${fieldName}-error` : undefined}><option value="">{committeeCount ? "Sélectionner un comité" : "En attente de l’annonce"}</option>{committeeOptions(committeeChoices[index])}</select><FieldError name={fieldName} message={fieldErrors[fieldName]} /></label>;
-        })}
-      </div>
-      <label><span>Votre pack <RequiredMark /></span><select name="pack" id="pack-select" required value={pack} onChange={(event) => onChoosePack(event.target.value)} aria-invalid={Boolean(fieldErrors.pack)} aria-describedby={fieldErrors.pack ? "pack-error" : undefined}><option value="">Choisir votre expérience</option><option value="550">Pack délégué — 550 DH</option><option value="1550">Pack avec hôtel — 1 550 DH</option></select><FieldError name="pack" message={fieldErrors.pack} /></label>
-      <label>Pourquoi souhaitez-vous participer au Alpha MUN et qu’espérez-vous tirer de cette expérience ?<textarea name="motivation" placeholder="Votre réponse (facultatif)" rows="5" /></label>
-      <label className="checkbox"><input type="checkbox" name="confirmation_pack" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.confirmation_pack)} aria-describedby={fieldErrors.confirmation_pack ? "confirmation_pack-error" : undefined} /><span>Je reconnais avoir choisi ce pack et j’en assume les conditions. <RequiredMark /></span><FieldError name="confirmation_pack" message={fieldErrors.confirmation_pack} /></label>
-      <label className="checkbox"><input type="checkbox" name="consentement" required onInvalid={markInvalid} aria-invalid={Boolean(fieldErrors.consentement)} aria-describedby={fieldErrors.consentement ? "consentement-error" : undefined} /><span>J’accepte que le YouthGlobalClub utilise ces informations pour traiter mon inscription et me contacter à propos de l’événement. <RequiredMark /></span><FieldError name="consentement" message={fieldErrors.consentement} /></label>
-      <button className="button" type="submit" disabled={pending}>{pending ? "Envoi en cours\u2026" : "Envoyer mon inscription"} <ArrowUpRight /></button>
-      <p id="form-status" role="status" aria-live="polite">{status}</p>
-    </form>
-  </section>;
-}
-
-export default Registration;

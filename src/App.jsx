@@ -1,3 +1,4 @@
+﻿import EventDetails from './components/EventDetails';
 import { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,6 +12,7 @@ import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 export default function App() {
-  const [pack, setPack] = useState('');
-  return <><Header /><main><Hero /><Countdown /><Story /><Committees /><Packs onChoosePack={setPack} /><Registration pack={pack} onChoosePack={setPack} /><Sponsors /><FAQ /><Contact /></main><Footer /></>;
+  const [pack, setPack] = useState(new URLSearchParams(window.location.search).get('pack') || '');
+  return <><Header /><main>{window.location.pathname.replace(/\/$/, '') === '/inscription' ? <Registration pack={pack} onChoosePack={setPack} /> : <><Hero /><Countdown /><Story /><Committees /><Packs onChoosePack={setPack} /><EventDetails /><Sponsors /><FAQ /><Contact /></>}</main><Footer /></>;
 }
+

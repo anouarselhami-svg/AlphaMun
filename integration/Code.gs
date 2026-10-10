@@ -1,3 +1,5 @@
+﻿const CONFIRMED_COMMITTEES = []; // Noms officiels, synchronis?s avec src/config.js
+const COMMITTEE_LANGUAGES = []; // Langues confirm?es uniquement
 const REGISTRATION_HEADERS = [
   'Date',
   'Prénom',
@@ -12,6 +14,20 @@ const REGISTRATION_HEADERS = [
   'Comité — choix 1',
   'Comité — choix 2',
   'Comité — choix 3',
+  "Âge",
+  "Téléphone",
+  "Contact parent / tuteur",
+  "Niveau scolaire",
+  "Langue des comités",
+  "Détails expérience MUN",
+  "Motivation premier comité",
+  "Attentes",
+  "Hébergement",
+  "Restrictions alimentaires",
+  "Besoins particuliers",
+  "Code de conduite accepté",
+  "Informations exactes",
+  "Consentement",
   'Motivation'
 ];
 
@@ -20,7 +36,7 @@ function doGet() {
   return registrationJson_({
     ok: true,
     service: 'alpha-mun-registration',
-    version: '4'
+    version: '5'
   });
 }
 
@@ -148,14 +164,14 @@ function doPost(e) {
       'etablissement',
       'ville',
       'experience',
-      'confirmation_pack'
+      'age', 'telephone', 'niveau', 'attentes', 'hebergement', 'code_conduite', 'exactitude', 'consentement', 'confirmation_pack'
     ];
 
     const missing = required.filter(field => !value(field));
 
     if (
       missing.length > 0 ||
-      !['550', '1550'].includes(value('pack')) ||
+      !['500', '1500'].includes(value('pack')) ||
       value('type') !== 'registration'
     ) {
       return registrationJson_({
@@ -174,6 +190,11 @@ function doPost(e) {
       });
     }
 
+    const accepted = ['confirmation_pack','code_conduite','exactitude','consentement'].every(field => value(field) === 'on');
+    const phone = text => /^\+?[\d\s().-]+$/.test(text) && text.replace(/\D/g, '').length >= 7 && text.replace(/\D/g, '').length <= 15;
+    if (!accepted || !/^\d+$/.test(value('age')) || !Number.isSafeInteger(Number(value('age'))) || Number(value('age')) <= 0 || !phone(value('telephone')) || (Number(value('age')) < 18 && !phone(value('contact_parent'))) || (value('contact_parent') && !phone(value('contact_parent'))) || !['oui','non'].includes(value('experience')) || !['oui','non','a_confirmer'].includes(value('hebergement')) || (COMMITTEE_LANGUAGES.length ? !COMMITTEE_LANGUAGES.includes(value('langue_comite')) : !!value('langue_comite'))) {
+      return registrationJson_({ok:false,code:'INVALID_FIELDS',requestId});
+    }
     const choices = [
       value('comite_choix_1') || value('comite'),
       value('comite_choix_2'),
@@ -192,8 +213,9 @@ function doPost(e) {
       });
     }
 
-    // Les choix vides sont acceptés.
-    // Le site gère les choix obligatoires après leur annonce.
+    if (choices.some((choice,index) => index < Math.min(3,CONFIRMED_COMMITTEES.length) ? !CONFIRMED_COMMITTEES.includes(choice) : !!choice) || (choices[0] && !value('motivation_comite'))) {
+      return registrationJson_({ok:false,code:'INVALID_COMMITTEES',requestId});
+    }
 
     phase = 'lock';
     lock.waitLock(10000);
@@ -221,6 +243,20 @@ function doPost(e) {
       'Comité — choix 1': safe(choices[0]),
       'Comité — choix 2': safe(choices[1]),
       'Comité — choix 3': safe(choices[2]),
+      "Âge": safe(value("age")),
+      "Téléphone": safe(value("telephone")),
+      "Contact parent / tuteur": safe(value("contact_parent")),
+      "Niveau scolaire": safe(value("niveau")),
+      "Langue des comités": safe(value("langue_comite")),
+      "Détails expérience MUN": safe(value("experience_details")),
+      "Motivation premier comité": safe(value("motivation_comite")),
+      "Attentes": safe(value("attentes")),
+      "Hébergement": safe(value("hebergement")),
+      "Restrictions alimentaires": safe(value("restrictions_alimentaires")),
+      "Besoins particuliers": safe(value("besoins_particuliers")),
+      "Code de conduite accepté": safe(value("code_conduite")),
+      "Informations exactes": safe(value("exactitude")),
+      "Consentement": safe(value("consentement")),
       'Motivation': safe(value('motivation'))
     };
 
@@ -278,3 +314,4 @@ function doPost(e) {
     if (locked) lock.releaseLock();
   }
 }
+

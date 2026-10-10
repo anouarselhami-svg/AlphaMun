@@ -21,14 +21,14 @@ export async function submitRegistration(data) {
     throw new RegistrationError('CONFIGURATION', 'L’adresse Apps Script doit être celle du déploiement public et terminer par /exec.');
   }
   const body = new URLSearchParams();
-  for (const field of ['nom', 'prenom', 'email', 'etablissement', 'ville', 'experience', 'comite', 'comite_choix_1', 'comite_choix_2', 'comite_choix_3', 'pack', 'motivation', 'confirmation_pack']) {
+  for (const field of ['nom','prenom','email','age','telephone','contact_parent','etablissement','niveau','ville','langue_comite','experience','experience_details','motivation_comite','attentes','hebergement','restrictions_alimentaires','besoins_particuliers','code_conduite','exactitude','consentement','comite_choix_1','comite_choix_2','comite_choix_3','pack','motivation','confirmation_pack']) {
     body.set(field, data[field] ?? '');
   }
   body.set('type', 'registration');
   let response;
   try {
     // Simple form POST, no custom headers, no automatic resubmission.
-    response = await fetch(endpoint, { method: 'POST', body, redirect: 'follow', signal: AbortSignal.timeout(20000) });
+    response = await fetch('/api/registration', { method: 'POST', body, redirect: 'follow', signal: AbortSignal.timeout(20000) });
   } catch (error) {
     const timedOut = error.name === 'TimeoutError' || error.name === 'AbortError';
     throw new RegistrationError(timedOut ? 'TIMEOUT' : 'RESPONSE_INACCESSIBLE',

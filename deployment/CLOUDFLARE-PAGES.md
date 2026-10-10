@@ -1,3 +1,5 @@
+> Mise a jour : consulter [integration/MISE-A-JOUR.md](../integration/MISE-A-JOUR.md). Le formulaire utilise maintenant une Pages Function ; un upload statique seul ne suffit plus. Les instructions historiques ci-dessous ne remplacent pas cette procedure.
+
 # Alpha MUN — Cloudflare Pages
 
 ## État actuel
