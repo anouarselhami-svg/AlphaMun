@@ -32,7 +32,7 @@ npm ci
 npm run build:all
 npx wrangler login
 npx wrangler pages deploy dist --project-name alpha-mun-main
-npx wrangler pages deploy dist --cwd registration-site --project-name alpha-mun-registration
+npx wrangler pages deploy dist --cwd registration-site --project-name alphamun-inscription
 ```
 
 Le dernier appel se place dans `registration-site`, où se trouvent `functions/api/registration.js` et `wrangler.toml`. Il déploie le relais en plus des ressources du formulaire. Le dossier `dist` de la racine ne contient aucune Function d’inscription. Le glisser-déposer du seul dossier de ressources ne déploie pas le relais.
@@ -86,3 +86,4 @@ Le test navigateur utilise Edge headless (chemin Windows par défaut, surcharge 
 Pour tester réellement Apps Script, créer un déploiement et un classeur de test séparés. Copier `registration-site/.dev.vars.example` vers `.dev.vars` dans ce dossier et remplacer la valeur par l’URL **de test**, puis utiliser `npx wrangler pages dev dist --cwd registration-site`. Vite seul ne fournit pas la Function.
 
 Après publication, `node scripts/verify-deployment.mjs https://DOMAINE_REEL` contrôle HTTPS et les ressources sans soumettre d’inscription. Une vérification réelle de l’enregistrement nécessite le classeur de test.
+

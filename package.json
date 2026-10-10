@@ -14,7 +14,7 @@
     "test": "node --test tests/registration.test.mjs tests/registration-route.test.mjs",
     "test:browser": "node scripts/verify-browser.mjs",
     "deploy:main": "npx wrangler pages deploy dist --project-name alpha-mun-main",
-    "deploy:registration": "npx wrangler pages deploy dist --cwd registration-site --project-name alpha-mun-registration"
+    "deploy:registration": "npx wrangler pages deploy dist --cwd registration-site --project-name alphamun-inscription"
   },
   "dependencies": {
     "react": "^19.0.0",
