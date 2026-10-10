@@ -24,6 +24,20 @@ try {
  const links=await evaluate(`Array.from(document.querySelectorAll('#packs a')).map(a=>({href:a.href,target:a.target,rel:a.rel}))`);
  assert.deepEqual(links.map(l=>l.href),['https://inscription.youthglobalclub.com/?pack=500','https://inscription.youthglobalclub.com/?pack=1500']);assert.ok(links.every(l=>l.target==='_blank'&&l.rel.includes('noopener')));
  assert.ok(await evaluate(`Array.from(document.querySelectorAll('a')).filter(a=>a.textContent.includes('S’inscrire')||a.textContent.includes('Devenir délégué')).every(a=>a.hash==='#packs')`));
+
+ console.log('Checking whole-site language switching');
+ await evaluate(`document.querySelector('.site-language button:last-child').click()`);await pause();
+ assert.equal(await evaluate('document.documentElement.lang'),'en');
+ for(const [selector,expected] of [['#accueil','Become a delegate'],['#histoire','A world to understand.'],['#comites','Every debate opens'],['#packs','Choose this package'],['#programme','Three days of connection.'],['#lieu','VENUE & SCHEDULE'],['#bureau','13 dedicated members.'],['#staff','Join the staff'],['#faq','What is a MUN?'],['#contact','Your name'],['footer','Back to top']])assert.ok(await evaluate(`document.querySelector('${selector}').textContent.includes(${JSON.stringify(expected)})`),selector);
+ assert.ok(await evaluate(`document.querySelector('.countdown').textContent.includes('DAYS')`));
+ assert.ok(await evaluate(`document.querySelector('[name="nom"]').placeholder==='Your name'`));
+ await call('Page.reload');await pause();await pause();assert.equal(await evaluate('document.documentElement.lang'),'en');
+ await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await pause();
+ assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'English mobile site overflow');
+ const mainScreenshot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,'main-mobile-en.png'),Buffer.from(mainScreenshot.data,'base64'));
+ await evaluate(`document.querySelector('.site-language button:first-child').click()`);await pause();assert.equal(await evaluate('document.documentElement.lang'),'fr');
+ assert.ok(await evaluate(`document.querySelector('#staff').textContent.includes('Devenir staff')`));
+ await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
  const set=async(name,value)=>{await evaluate(`(()=>{const e=document.querySelector('[name="${name}"]');const setter=Object.getOwnPropertyDescriptor(e.tagName==='SELECT'?HTMLSelectElement.prototype:e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype,'value').set;setter.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));})()`);await pause();};
  const click=async text=>{assert.ok(await evaluate(`(()=>{const button=Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()===${JSON.stringify(text)});button?.click();return !!button;})()`),text);await pause();};
  console.log('Checking pack entry URLs');

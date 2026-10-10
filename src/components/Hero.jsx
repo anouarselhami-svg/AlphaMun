@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageContext';
 function AssemblyDrawing() {
   return <svg className="assembly-drawing" viewBox="0 0 600 200" fill="none" aria-hidden="true">
     <g stroke="currentColor" strokeWidth=".8">
@@ -11,20 +12,21 @@ function AssemblyDrawing() {
   </svg>;
 }
 export default function Hero() {
+  const { t, language } = useLanguage();
   return <section className="hero" id="accueil">
     <div className="hero-copy">
-      <p className="eyebrow"><span className="dot" /> LA JEUNESSE PREND LA PAROLE</p>
-      <h1>La parole<br />devient <em>action.</em></h1>
-      <p className="intro">Trois jours pour débattre, créer des liens et faire entendre votre voix. Entrez dans la peau d’un diplomate avec Alpha MUN.</p>
-      <div className="hero-actions"><a className="button" href="/#packs">Devenir délégué <ArrowUpRight /></a><a className="text-link" href="#histoire">Découvrir l’expérience <ArrowDown /></a></div>
-      <div className="hero-foot"><div className="hero-date"><span className="date-number">22, 23 et 24 janvier</span><span><b>KÉNITRA, MAROC</b></span></div><span className="edition">7 ans<small>d’impact & de leadership</small></span></div>
+      <p className="eyebrow"><span className="dot" />{t("LA JEUNESSE PREND LA PAROLE")}</p>
+      <h1>{t("La parole")}<br />{t("devient")} <em>{t("action.")}</em></h1>
+      <p className="intro">{t("Trois jours pour débattre, créer des liens et faire entendre votre voix. Entrez dans la peau d’un diplomate avec Alpha MUN.")}</p>
+      <div className="hero-actions"><a className="button" href="/#packs">{t("Devenir délégué")} <ArrowUpRight /></a><a className="text-link" href="#histoire">{t("Découvrir l’expérience")} <ArrowDown /></a></div>
+      <div className="hero-foot"><div className="hero-date"><span className="date-number">{t("22, 23 et 24 janvier")}</span><span><b>{t("KÉNITRA, MAROC")}</b></span></div><span className="edition">{t("7 ans")}<small>{t("d’impact & de leadership")}</small></span></div>
     </div>
     <div className="hero-art">
       <div className="art-top"><span>MODEL UNITED NATIONS</span><span>YGC / KÉNITRA</span></div>
-      <div className="emblem-stage"><span className="ornament ornament-one" aria-hidden="true">✦</span><img className="hero-logo" src="/assets/alpha-logo.svg" alt="Logo Alpha MUN" /><span className="ornament ornament-two" aria-hidden="true">✦</span><div className="emblem-wordmark">ALPHA MUN<small>YOUTHGLOBALCLUB</small></div></div>
+      <div className="emblem-stage"><span className="ornament ornament-one" aria-hidden="true">✦</span><img className="hero-logo" src="/assets/alpha-logo.svg" alt={t("Logo Alpha MUN")} /><span className="ornament ornament-two" aria-hidden="true">✦</span><div className="emblem-wordmark">ALPHA MUN<small>YOUTHGLOBALCLUB</small></div></div>
       <AssemblyDrawing />
-      <div className="art-caption"><span>VOTRE VOIX.<br />NOTRE MONDE.</span><a className="button art-signup" href="/#packs">S’inscrire <ArrowUpRight /></a></div>
-      <div className="art-label">DIALOGUE <span>✦</span> DIPLOMATIE <span>✦</span> LEADERSHIP</div>
+      <div className="art-caption"><span>{t("VOTRE VOIX.")}<br />{t("NOTRE MONDE.")}</span><a className="button art-signup" href="/#packs">{t("S’inscrire")} <ArrowUpRight /></a></div>
+      <div className="art-label">DIALOGUE <span>✦</span>{t("DIPLOMATIE")} <span>✦</span> LEADERSHIP</div>
     </div>
   </section>;
 }

@@ -1,3 +1,4 @@
+import { LanguageProvider } from './i18n/LanguageContext';
 ﻿import EventDetails from './components/EventDetails';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -10,6 +11,6 @@ import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 export default function App() {
-  return <><Header /><main><Hero /><Countdown /><Story /><Committees /><Packs /><EventDetails /><Sponsors /><FAQ /><Contact /></main><Footer /></>;
+  return <LanguageProvider><Header /><main><Hero /><Countdown /><Story /><Committees /><Packs /><EventDetails /><Sponsors /><FAQ /><Contact /></main><Footer /></LanguageProvider>;
 }
 
