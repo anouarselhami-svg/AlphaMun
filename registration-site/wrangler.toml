@@ -1,0 +1,4 @@
+﻿name = "alpha-mun-registration"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-10"
+# Configure APPS_SCRIPT_URL as a Pages runtime secret; never commit its value here.

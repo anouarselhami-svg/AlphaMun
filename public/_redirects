@@ -1,2 +1,1 @@
-﻿/inscription /index.html 200
-/inscription/ /index.html 200
+﻿# /inscription is served by dist/inscription.html (Cloudflare extensionless HTML).

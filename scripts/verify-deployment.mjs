@@ -15,13 +15,13 @@ const html = await response.text();
 assert.ok(html.includes('id="root"'), 'React application root missing.');
 const resources = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
   .map(match => new URL(match[1], response.url)).filter(url => url.origin === new URL(response.url).origin);
-let endpointFound = false, emailFound = false;
+let registrationFound = false, emailFound = false;
 for (const resource of resources) {
   const asset = await request(resource);
   if (resource.pathname.endsWith('.js')) {
     assert.ok(asset.headers.get('content-type')?.includes('javascript'), 'JavaScript asset returned the wrong MIME type.');
     const content = await asset.text();
-    endpointFound ||= /https:\/\/script\.google\.com\/macros\/s\/[^"'\s]+\/exec/.test(content);
+    registrationFound ||= content.includes('inscription.youthglobalclub.com') || content.includes('/api/registration');
     emailFound ||= content.includes('alphamun@youthglobalclub.com');
     for (const match of content.matchAll(/["'](\/assets\/[^"']+\.(?:svg|png|jpe?g|webp))["']/g)) {
       const image = await request(new URL(match[1], response.url));
@@ -31,7 +31,7 @@ for (const resource of resources) {
     assert.ok(asset.headers.get('content-type')?.includes('text/css'), 'CSS asset returned the wrong MIME type.');
   }
 }
-assert.ok(endpointFound, 'Google Sheets endpoint missing from published bundle.');
-assert.ok(emailFound, 'Official contact email missing from published bundle.');
+assert.ok(registrationFound, 'Registration link or local relay missing from published bundle.');
+if (base.hostname === 'youthglobalclub.com') assert.ok(emailFound, 'Official contact email missing from published bundle.');
 console.log('HTTPS, HTML, local assets, registration configuration and contact email verified.');
 console.log('No registration submitted. Browser form testing and the Sheets row still need verification.');

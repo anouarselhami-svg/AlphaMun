@@ -1,4 +1,3 @@
-import { config } from '../config';
 
 export class RegistrationError extends Error {
   constructor(code, message, diagnostics = {}) {
@@ -10,16 +9,6 @@ export class RegistrationError extends Error {
 }
 
 export async function submitRegistration(data) {
-  const endpoint = config.appsScriptUrl;
-  let url;
-  try {
-    url = new URL(endpoint);
-  } catch {
-    throw new RegistrationError('CONFIGURATION', 'L’adresse du formulaire est absente ou invalide.');
-  }
-  if (url.origin !== 'https://script.google.com' || !/^\/macros\/s\/[^/]+\/exec$/.test(url.pathname) || url.search || url.hash) {
-    throw new RegistrationError('CONFIGURATION', 'L’adresse Apps Script doit être celle du déploiement public et terminer par /exec.');
-  }
   const body = new URLSearchParams();
   for (const field of ['nom','prenom','email','age','telephone','contact_parent','etablissement','niveau','ville','langue_comite','experience','experience_details','motivation_comite','attentes','hebergement','restrictions_alimentaires','besoins_particuliers','code_conduite','exactitude','consentement','comite_choix_1','comite_choix_2','comite_choix_3','pack','motivation','confirmation_pack']) {
     body.set(field, data[field] ?? '');

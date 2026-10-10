@@ -1,5 +1,5 @@
-﻿const CONFIRMED_COMMITTEES = []; // Noms officiels, synchronis?s avec src/config.js
-const COMMITTEE_LANGUAGES = []; // Langues confirm?es uniquement
+﻿const CONFIRMED_COMMITTEES = []; // Noms officiels, synchronisés avec src/config.js
+const COMMITTEE_LANGUAGES = []; // Langues confirmées uniquement
 const REGISTRATION_HEADERS = [
   'Date',
   'Prénom',
@@ -314,4 +314,5 @@ function doPost(e) {
     if (locked) lock.releaseLock();
   }
 }
+
 
