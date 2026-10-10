@@ -1,4 +1,4 @@
-import { useLanguage } from '../i18n/LanguageContext';
+﻿import { useLanguage } from '../i18n/LanguageContext';
 function AssemblyDrawing() {
   return <svg className="assembly-drawing" viewBox="0 0 600 200" fill="none" aria-hidden="true">
     <g stroke="currentColor" strokeWidth=".8">
@@ -23,7 +23,7 @@ export default function Hero() {
     </div>
     <div className="hero-art">
       <div className="art-top"><span>MODEL UNITED NATIONS</span><span>YGC / KÉNITRA</span></div>
-      <div className="emblem-stage"><span className="ornament ornament-one" aria-hidden="true">✦</span><img className="hero-logo" src="/assets/alpha-logo.svg" alt={t("Logo Alpha MUN")} /><span className="ornament ornament-two" aria-hidden="true">✦</span><div className="emblem-wordmark">ALPHA MUN<small>YOUTHGLOBALCLUB</small></div></div>
+      <div className="emblem-stage"><span className="ornament ornament-one" aria-hidden="true">✦</span><img className="hero-logo" src="/assets/alpha-logo-clear.svg" alt={t("Logo Alpha MUN")} /><span className="ornament ornament-two" aria-hidden="true">✦</span><div className="emblem-wordmark">ALPHA MUN<small>YOUTHGLOBALCLUB</small></div></div>
       <AssemblyDrawing />
       <div className="art-caption"><span>{t("VOTRE VOIX.")}<br />{t("NOTRE MONDE.")}</span><a className="button art-signup" href="/#packs">{t("S’inscrire")} <ArrowUpRight /></a></div>
       <div className="art-label">DIALOGUE <span>✦</span>{t("DIPLOMATIE")} <span>✦</span> LEADERSHIP</div>
@@ -31,3 +31,4 @@ export default function Hero() {
   </section>;
 }
 import { ArrowDown, ArrowUpRight } from './icons';
+
