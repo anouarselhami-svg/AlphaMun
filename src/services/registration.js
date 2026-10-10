@@ -10,7 +10,7 @@ export class RegistrationError extends Error {
 
 export async function submitRegistration(data) {
   const body = new URLSearchParams();
-  for (const field of ['nom','prenom','email','age','telephone','contact_parent','etablissement','niveau','ville','langue_comite','experience','experience_details','motivation_comite','attentes','hebergement','restrictions_alimentaires','besoins_particuliers','code_conduite','exactitude','consentement','comite_choix_1','comite_choix_2','comite_choix_3','pack','motivation','confirmation_pack']) {
+  for (const field of ["prenom","nom","age","email","telephone","contact_parent","ville","etablissement","niveau","comite_choix_1","comite_choix_2","comite_choix_3","participations_mun","experience_details","motivation","attentes","pack","logistique","confirmation_pack","consentement","code_conduite","exactitude"]) {
     body.set(field, data[field] ?? '');
   }
   body.set('type', 'registration');

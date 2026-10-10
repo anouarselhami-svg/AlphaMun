@@ -1,5 +1,4 @@
-﻿const CONFIRMED_COMMITTEES = []; // Noms officiels, synchronisés avec src/config.js
-const COMMITTEE_LANGUAGES = []; // Langues confirmées uniquement
+﻿const CONFIRMED_COMMITTEES = ["INTERPOL","INTERSS","UN Women","AU PSC","ICJ","UNOOSA","UE","CSNU","OMS","ECOSOC","IAIGC","UNESCO","DISEC","MPS"];
 const REGISTRATION_HEADERS = [
   'Date',
   'Prénom',
@@ -28,6 +27,8 @@ const REGISTRATION_HEADERS = [
   "Code de conduite accepté",
   "Informations exactes",
   "Consentement",
+  'Nombre de participations MUN',
+  'Logistique et besoins particuliers',
   'Motivation'
 ];
 
@@ -36,7 +37,7 @@ function doGet() {
   return registrationJson_({
     ok: true,
     service: 'alpha-mun-registration',
-    version: '5'
+    version: '6'
   });
 }
 
@@ -157,15 +158,7 @@ function doPost(e) {
     const parameters = (e && e.parameter) || {};
     const value = field => String(parameters[field] || '').trim();
 
-    const required = [
-      'prenom',
-      'nom',
-      'email',
-      'etablissement',
-      'ville',
-      'experience',
-      'age', 'telephone', 'niveau', 'attentes', 'hebergement', 'code_conduite', 'exactitude', 'consentement', 'confirmation_pack'
-    ];
+    const required = ["prenom","nom","age","email","telephone","contact_parent","ville","etablissement","niveau","comite_choix_1","comite_choix_2","comite_choix_3","participations_mun","experience_details","motivation","attentes","pack","logistique","confirmation_pack","consentement","code_conduite","exactitude"];
 
     const missing = required.filter(field => !value(field));
 
@@ -192,7 +185,7 @@ function doPost(e) {
 
     const accepted = ['confirmation_pack','code_conduite','exactitude','consentement'].every(field => value(field) === 'on');
     const phone = text => /^\+?[\d\s().-]+$/.test(text) && text.replace(/\D/g, '').length >= 7 && text.replace(/\D/g, '').length <= 15;
-    if (!accepted || !/^\d+$/.test(value('age')) || !Number.isSafeInteger(Number(value('age'))) || Number(value('age')) <= 0 || !phone(value('telephone')) || (Number(value('age')) < 18 && !phone(value('contact_parent'))) || (value('contact_parent') && !phone(value('contact_parent'))) || !['oui','non'].includes(value('experience')) || !['oui','non','a_confirmer'].includes(value('hebergement')) || (COMMITTEE_LANGUAGES.length ? !COMMITTEE_LANGUAGES.includes(value('langue_comite')) : !!value('langue_comite'))) {
+    if (!accepted || !/^\d+$/.test(value('age')) || !Number.isSafeInteger(Number(value('age'))) || Number(value('age')) <= 0 || !phone(value('telephone')) || !phone(value('contact_parent')) || !/^\d+$/.test(value('participations_mun')) || !Number.isSafeInteger(Number(value('participations_mun')))) {
       return registrationJson_({ok:false,code:'INVALID_FIELDS',requestId});
     }
     const choices = [
@@ -213,7 +206,7 @@ function doPost(e) {
       });
     }
 
-    if (choices.some((choice,index) => index < Math.min(3,CONFIRMED_COMMITTEES.length) ? !CONFIRMED_COMMITTEES.includes(choice) : !!choice) || (choices[0] && !value('motivation_comite'))) {
+    if (choices.length !== 3 || choices.some(choice => !CONFIRMED_COMMITTEES.includes(choice))) {
       return registrationJson_({ok:false,code:'INVALID_COMMITTEES',requestId});
     }
 
@@ -257,6 +250,8 @@ function doPost(e) {
       "Code de conduite accepté": safe(value("code_conduite")),
       "Informations exactes": safe(value("exactitude")),
       "Consentement": safe(value("consentement")),
+      'Nombre de participations MUN': safe(value('participations_mun')),
+      'Logistique et besoins particuliers': safe(value('logistique')),
       'Motivation': safe(value('motivation'))
     };
 

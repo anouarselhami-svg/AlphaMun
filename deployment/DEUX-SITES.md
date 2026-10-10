@@ -65,11 +65,11 @@ Références officielles : [domaines personnalisés](https://developers.cloudfla
 
 Remplacer le code du projet Apps Script existant par l’intégralité de `integration/Code.gs`. Conserver `SPREADSHEET_ID` ou le classeur lié. Exécuter `preparerColonnes` : cette fonction ajoute les colonnes manquantes, déplace « Motivation » et ses anciennes valeurs en dernière colonne, sans créer d’inscription ni remplacer les tarifs historiques.
 
-Déployer > Gérer les déploiements > Modifier le déploiement existant > Nouvelle version > Déployer. Conserver la même URL publique `/exec` et l’exécution en tant que propriétaire. Un GET retourne la version 5 sans écriture. Ne pas exécuter un POST de test sur le classeur de production.
+Déployer > Gérer les déploiements > Modifier le déploiement existant > Nouvelle version > Déployer. Conserver la même URL publique `/exec` et l’exécution en tant que propriétaire. Un GET retourne la version 6 sans écriture. Ne pas exécuter un POST de test sur le classeur de production.
 
-Le script valide les champs requis, l’âge entier positif sans limite d’admission inventée, le contact parental conditionnel, les tarifs 500 / 1500 et les cases exactement cochées. Les choix sont distincts, validés contre les listes officielles et requis jusqu’à trois selon leur nombre. Les valeurs sont associées par en-têtes, protégées contre les formules, et enregistrées sous verrou. Le succès est retourné après l’écriture et `flush`.
+Le script valide les champs requis, l’âge entier positif sans limite d’admission inventée, le contact parental obligatoire pour tous, les tarifs 500 / 1500 et les cases exactement cochées. Les choix sont distincts, validés contre les listes officielles et requis jusqu’à trois selon leur nombre. Les valeurs sont associées par en-têtes, protégées contre les formules, et enregistrées sous verrou. Le succès est retourné après l’écriture et `flush`.
 
-Les listes `config.committees` / `config.committeeLanguages` et `CONFIRMED_COMMITTEES` / `COMMITTEE_LANGUAGES` dans Apps Script doivent rester synchronisées. Actuellement elles sont vides : aucune langue ni aucun comité n’est inventé, et le formulaire permet de poursuivre.
+Les comités et leurs langues sont maintenant fournis pour le formulaire dans `src/services/registration-schema.js`. La liste `CONFIRMED_COMMITTEES` de Code.gs doit correspondre. Consulter [FORMULAIRE-CINQ-ETAPES.md](FORMULAIRE-CINQ-ETAPES.md) pour la version actuelle et les textes à confirmer avant publication.
 
 ## Vérification sans production
 
@@ -86,4 +86,5 @@ Le test navigateur utilise Edge headless (chemin Windows par défaut, surcharge 
 Pour tester réellement Apps Script, créer un déploiement et un classeur de test séparés. Copier `registration-site/.dev.vars.example` vers `.dev.vars` dans ce dossier et remplacer la valeur par l’URL **de test**, puis utiliser `npx wrangler pages dev dist --cwd registration-site`. Vite seul ne fournit pas la Function.
 
 Après publication, `node scripts/verify-deployment.mjs https://DOMAINE_REEL` contrôle HTTPS et les ressources sans soumettre d’inscription. Une vérification réelle de l’enregistrement nécessite le classeur de test.
+
 

@@ -27,3 +27,7 @@
 .selected-pack label {display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .selected-pack select {padding:10px;background:var(--paper);color:var(--ink);max-width:100%;border:1px solid var(--line)}
 @media(max-width:700px){.registration-header{gap:12px}.registration-header .brand small{display:none}}
+.registration-progress {grid-template-columns:repeat(5,minmax(0,1fr))}
+.registration-fields .name-group-title {margin:0;font-weight:600}
+.registration-fields .checkbox small {flex-basis:100%}
+@media(max-width:700px){.registration-progress{grid-template-columns:1fr 1fr}.registration-progress li:last-child{grid-column:1/-1}}
