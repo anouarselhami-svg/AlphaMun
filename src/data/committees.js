@@ -38,10 +38,10 @@ export const committeeVisualNotes = {
 
 // Verified against the acronym visible in each supplied image.
 const committeeLogos = {
- INTERPOL: 'interpol.jpg', INTERSS: 'interss.jpg', 'UN WOMEN': 'unwomen.jpg',
- 'AU PSC': 'aupsc.jpg', ICJ: 'icj.jpg', UNOOSA: 'unoosa.jpg', UE: 'ue.jpg',
- 'CSNU': 'csnu.jpg', OMS: 'oms.jpg', ECOSOC: 'ecosoc.jpg',
- UNESCO: 'unesco.jpg', MPS: 'mps.jpg', CIGIA: 'cigia.jpg', UNICEF: 'unicef.jpg', UNODC: 'unodc.jpg',
+ INTERPOL: 'interpol-transparent.png', INTERSS: 'interss-transparent.png', 'UN WOMEN': 'unwomen-transparent.png',
+ 'AU PSC': 'aupsc-transparent.png', ICJ: 'icj-transparent.png', UNOOSA: 'unoosa-transparent.png', UE: 'ue-transparent.png',
+ 'CSNU': 'csnu-transparent.png', OMS: 'oms-transparent.png', ECOSOC: 'ecosoc-transparent.png',
+ UNESCO: 'unesco-transparent.png', MPS: 'mps-transparent.png', CIGIA: 'cigia-transparent.png', UNICEF: 'unicef-transparent.png', UNODC: 'unodc-transparent.png',
 };
 for (const committee of committees) {
  const filename = committeeLogos[committee.acronym];

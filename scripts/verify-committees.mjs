@@ -63,7 +63,11 @@ try {
   await evaluate("document.querySelectorAll('.committee-logo img').forEach(img=>img.loading='eager');document.querySelector('.committee-filters').scrollIntoView({behavior:'instant',block:'center'})");await pause();
   await new Promise(r=>setTimeout(r,500));
   assert.ok(await evaluate("[...document.querySelectorAll('.committee-logo img')].every(e=>e.complete&&e.naturalWidth>0)"),'Logo loading');
-  const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`committees-${width}.png`),Buffer.from(capture.data,'base64'));
+  const alpha=await evaluate(`(()=>{return [...document.querySelectorAll('.committee-logo img')].map(img=>{const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;const context=canvas.getContext('2d');context.drawImage(img,0,0);const {data}=context.getImageData(0,0,canvas.width,canvas.height);let clear=0,solid=0;for(let i=3;i<data.length;i+=4){if(data[i]===0)clear++;if(data[i]===255)solid++;}return {src:img.getAttribute('src'),clear,solid,corners:[data[3],data[(canvas.width-1)*4+3],data[(canvas.width*(canvas.height-1))*4+3],data[data.length-1]],sameBackground:getComputedStyle(img.parentElement).backgroundColor===getComputedStyle(img.closest('.committee-card')).backgroundColor};});})()`);
+  assert.equal(alpha.length,15);
+  assert.ok(alpha.every(item=>item.src.endsWith('-transparent.png')&&item.clear>0&&item.solid>0&&item.corners.every(value=>value===0)&&item.sameBackground),'Transparent PNGs and uniform cream backgrounds');
+  const bounds=await evaluate("(()=>{const r=document.querySelector('#comites').getBoundingClientRect();return {x:r.left+scrollX,y:r.top+scrollY,width:r.width,height:r.height,scale:1};})()");
+  const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:bounds});await writeFile(path.join(directory,`committees-transparent-${width}.png`),Buffer.from(capture.data,'base64'));
   console.log(`${width}px: 15 committees, FR/EN, 2/3/4 columns, exclusive disclosure, keyboard/ARIA, language filters, topic, no overflow; programme/board/registration preserved.`);
  }
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}
