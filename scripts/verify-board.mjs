@@ -20,6 +20,7 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
+ await evaluate("document.querySelector('#bureau .disclosure-button').click()");await pause();
  const expectedNames=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Laila Addab','Yasmine Bentaleb','Nidal ElHammioui','Meryem Hajji','Adam Dekiouak','Asmae Ajabbade','Yasmine Alaoui'];
  const fr=['Présidente','Vice-présidente','Secrétaire général','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Communication','Head of Media','Head of Staff','Head of Sponsorships','Trésorière'];
  const en=['President','Vice-President','Secretary-General',...fr.slice(3,10),'Treasurer'];

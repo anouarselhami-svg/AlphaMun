@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 
 import { programme } from '../data/programme';
+import { useDisclosure } from '../hooks/useDisclosure';
 
 // The supplied UIR and Lalla-Laaroussa filenames are reversed; match their actual photographs.
 const days = [
@@ -39,26 +40,29 @@ export default function Programme() {
   const {language} = useLanguage();
   const english = language === 'en';
   const [activeDay, setActiveDay] = useState(0);
+  const { expanded, toggle, reset, startRef } = useDisclosure();
+  const selectDay = index => { if (index !== activeDay) { reset(); setActiveDay(index); } };
   const tabs = useRef([]);
   const keyboard = (event, index) => {
     const next = { ArrowRight: (index + 1) % 3, ArrowLeft: (index + 2) % 3, Home: 0, End: 2 }[event.key];
     if (next === undefined) return;
     event.preventDefault();
-    setActiveDay(next);
+    selectDay(next);
     tabs.current[next].focus();
   };
   return <section className="section programme" id="programme" aria-labelledby="programme-title">
     <p className="eyebrow">PROGRAMME</p><h2 id="programme-title">{english?'Three days of connection.':'Trois jours de rencontres.'}</h2>
     <p className="programme-intro">{english?'Three days, three unique venues, one unforgettable MUN experience.':'Trois jours, trois lieux uniques, une expérience MUN inoubliable.'}</p>
     <div className="programme-grid">{days.map((day,index)=><DayCard key={day.name} day={day} index={index} english={english}/>)}</div>
-    <div className="programme-schedule">
+    <div className="programme-schedule" ref={startRef}>
       <div className="programme-tabs" role="tablist" aria-label={english ? 'Daily schedule' : 'Planning par journée'}>
-        {programme.map((day,index) => <button key={day.venue} ref={node => {tabs.current[index] = node;}} type="button" role="tab" id={`programme-tab-${index}`} aria-controls={`programme-panel-${index}`} aria-selected={activeDay === index} tabIndex={activeDay === index ? 0 : -1} onClick={() => setActiveDay(index)} onKeyDown={event => keyboard(event,index)}>{english ? 'Day' : 'Jour'} {index+1}</button>)}
+        {programme.map((day,index) => <button key={day.venue} ref={node => {tabs.current[index] = node;}} type="button" role="tab" id={`programme-tab-${index}`} aria-controls={`programme-panel-${index}`} aria-selected={activeDay === index} tabIndex={activeDay === index ? 0 : -1} onClick={() => selectDay(index)} onKeyDown={event => keyboard(event,index)}>{english ? 'Day' : 'Jour'} {index+1}</button>)}
       </div>
       {programme.map((day,index) => <div key={day.venue} role="tabpanel" id={`programme-panel-${index}`} aria-labelledby={`programme-tab-${index}`} hidden={activeDay !== index} tabIndex={0} lang="fr">
         <h3>{day.title} — {day.venue}</h3>
-        <ol className="programme-slots">{day.slots.map(([time,activity]) => <li key={time}><span className="programme-time">{time}</span><p>{activity}</p></li>)}</ol>
+        <ol className="programme-slots" id={`programme-slots-${index}`}>{day.slots.map(([time,activity], slotIndex) => <li key={time} hidden={!expanded && slotIndex >= 3}><span className="programme-time">{time}</span><p>{activity}</p></li>)}</ol>
       </div>)}
+      <button type="button" className="disclosure-button" aria-expanded={expanded} aria-controls={`programme-slots-${activeDay}`} onClick={toggle}>{english ? (expanded ? 'Show less of the programme ↑' : 'View the full programme ↓') : (expanded ? 'Réduire le programme ↑' : 'Voir le programme complet ↓')}</button>
     </div>
   </section>;
 }

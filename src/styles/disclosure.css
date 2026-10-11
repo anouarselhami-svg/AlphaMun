@@ -1,0 +1,6 @@
+﻿/* Compact sections retain their original typography. */
+.section {padding-top:clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px)}
+.programme-slots li[hidden],.board-card[hidden] {display:none}
+.disclosure-button {display:block;max-width:100%;margin:24px auto 0;padding:12px 18px;min-height:44px;border:1px solid var(--gold);border-radius:6px;background:var(--paper);color:var(--wine);font:inherit;font-weight:600;line-height:1.5;cursor:pointer}
+.disclosure-button:hover {background:var(--surface);border-color:var(--wine)}
+.disclosure-button:focus-visible {outline:3px solid var(--wine);outline-offset:4px}
