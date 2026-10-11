@@ -1,7 +1,7 @@
 import { useLanguage, LanguageSwitch } from '../i18n/LanguageContext';
 import { useEffect, useState } from 'react';
 import { ArrowUpRight } from './icons';
-const links = [['histoire', 'L’esprit Alpha'], ['comites', 'Comités'], ['packs', 'Les packs'], ['faq', 'FAQ']];
+const links = [['histoire', 'L’esprit Alpha'], ['comites', 'Comités'], ['packs', 'Les packs'], ['programme', 'Programme'], ['faq', 'FAQ']];
 export default function Header() {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);

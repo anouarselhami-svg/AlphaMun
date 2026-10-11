@@ -17,3 +17,14 @@
 @media(min-width:641px) and (max-width:1000px){.programme-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}}
 @media(max-width:640px){.programme-grid{grid-template-columns:1fr;gap:24px}.programme .programme-intro{margin:18px 0 28px}.programme-card-copy{padding:22px}.programme-card h3{font-size:1.5rem}}
 @media(prefers-reduced-motion:reduce){.programme-card-animated,.programme-card-animated.is-visible{opacity:1;transform:none;transition:none}.programme-photo img{transition:none}.programme-card:hover .programme-photo img{transform:none}}
+.programme-schedule {margin-top:40px;min-width:0}
+.programme-tabs {display:flex;gap:12px;margin-bottom:28px}
+.programme-tabs button {flex:1;min-width:0;padding:14px 10px;border:1px solid var(--wine);border-radius:6px;background:var(--paper);color:var(--wine);font:inherit;cursor:pointer}
+.programme-tabs button[aria-selected="true"] {background:var(--wine);color:var(--paper);font-weight:700}
+.programme-tabs button:focus-visible,.programme-schedule [role="tabpanel"]:focus-visible {outline:3px solid var(--wine);outline-offset:4px}
+.programme-schedule h3 {font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.3rem,2vw,1.8rem);line-height:1.4}
+.programme-slots {list-style:none;padding:0;margin:24px 0 0}
+.programme-slots li {display:grid;grid-template-columns:140px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line);align-items:start}
+.programme-time {color:var(--wine);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.programme-slots p {margin:0;overflow-wrap:anywhere;line-height:1.65}
+@media(max-width:640px){.programme-slots li{grid-template-columns:1fr;gap:6px}.programme-tabs{gap:8px}}

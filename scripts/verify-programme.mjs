@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { preview } from 'vite';
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -25,6 +25,36 @@ try {
  assert.deepEqual(links.map(l=>l.href),['https://inscription.youthglobalclub.com/?pack=500','https://inscription.youthglobalclub.com/?pack=1500']);assert.ok(links.every(l=>l.target==='_blank'&&l.rel.includes('noopener')));
  assert.ok(await evaluate(`Array.from(document.querySelectorAll('a')).filter(a=>a.textContent.includes('S’inscrire')||a.textContent.includes('Devenir délégué')).every(a=>a.hash==='#packs')`));
 
+ console.log('Checking final schedule and accessible tabs');
+ assert.equal(await evaluate("document.querySelectorAll('#programme .programme-slots li').length"),26);
+ assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.programme-slots')).map(e=>e.children.length)"),[9,12,5]);
+ assert.equal(await evaluate("document.querySelectorAll('nav a[href=\"/#programme\"]').length"),1);
+ for (let day=0;day<3;day++) {
+   await evaluate(`document.querySelectorAll('.programme-tabs button')[${day}].click()`);await pause();
+   assert.equal(await evaluate("document.querySelector('.programme-tabs [aria-selected=true]').id"),`programme-tab-${day}`);
+   assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').id"),`programme-panel-${day}`);
+ }
+ await evaluate("document.querySelector('#programme-tab-2').focus()");
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight'});await pause();
+ assert.equal(await evaluate('document.activeElement.id'),'programme-tab-0');
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'End',code:'End'});await pause();
+ assert.equal(await evaluate('document.activeElement.id'),'programme-tab-2');
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowLeft',code:'ArrowLeft'});await pause();
+ assert.equal(await evaluate('document.activeElement.id'),'programme-tab-1');
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'});await pause();
+ assert.equal(await evaluate('document.activeElement.id'),'programme-tab-0');
+ await call('Emulation.setDeviceMetricsOverride',{width:320,height:844,deviceScaleFactor:1,mobile:true});
+ await call('Emulation.setTouchEmulationEnabled',{enabled:true});
+ for(let day=0;day<3;day++) {
+   await evaluate(`document.querySelectorAll('.programme-tabs button')[${day}].scrollIntoView({block:'center',behavior:'instant'})`);await pause();
+   const point=await evaluate(`(()=>{const r=document.querySelectorAll('.programme-tabs button')[${day}].getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+   await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
+   await pause();await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await new Promise(r=>setTimeout(r,500));
+   assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').id"),`programme-panel-${day}`);
+   assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'320px schedule overflow');
+ }
+ await call('Emulation.setTouchEmulationEnabled',{enabled:false});
+ console.log('26 slots; click, touch, arrows, Home/End and 320px layout verified.');
  console.log('Checking whole-site language switching');
  await evaluate(`document.querySelector('.site-language button:last-child').click()`);await pause();
  assert.equal(await evaluate('document.documentElement.lang'),'en');
