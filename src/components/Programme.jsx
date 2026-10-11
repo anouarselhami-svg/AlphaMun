@@ -41,10 +41,12 @@ function DayCard({day,index,english}) {
     <div className="programme-photo">
       {failed?<div className="programme-placeholder" role="img" aria-label={english?`Photograph of ${day.venue} coming soon`:`Photographie de ${day.venue} à venir`}><span aria-hidden="true">◎</span><p>{day.name}</p><small>{english?'Photograph coming soon':'Photographie à venir'}</small></div>:<img src={day.image} alt={english?`View of ${day.venue}`:`Vue de ${day.venue}`} width={day.width} height={day.height} loading="lazy" decoding="async" style={{objectPosition:day.position}} onError={()=>setFailed(true)}/>}
     </div>
-    <div className="programme-card-copy"><p className="eyebrow">{english?'DAY':'JOUR'} {index+1}</p>
+    <div className="programme-card-copy"><div className="programme-presentation"><div className="programme-presentation-content"><p className="eyebrow">{english?'DAY':'JOUR'} {index+1}</p>
       <h3>{english?'Day':'Jour'} {index+1} — {day.name}</h3>
       <p className="programme-venue">{english?'Venue':'Lieu'} : {day.venue}</p><p className="programme-description">{english?day.en:day.fr}</p>
+      </div>
       <button className="programme-day-toggle" type="button" id={`programme-tab-${index}`} aria-controls={`programme-panel-${index}`} aria-expanded={open} onClick={() => setOpen(current => !current)}><span>{english?'Day':'Jour'} {index+1}</span><ArrowDown /></button>
+      </div>
       <Schedule index={index} open={open} />
     </div>
   </article>;
@@ -53,9 +55,21 @@ function DayCard({day,index,english}) {
 export default function Programme() {
   const {language} = useLanguage();
   const english = language === 'en';
+  const gridRef = useRef(null);
+  const [presentationHeight, setPresentationHeight] = useState(0);
+  useEffect(() => {
+    const grid = gridRef.current;
+    const contents = [...grid.querySelectorAll('.programme-presentation-content')];
+    const buttons = [...grid.querySelectorAll('.programme-day-toggle')];
+    const measure = () => setPresentationHeight(Math.ceil(Math.max(...contents.map((content, index) => content.getBoundingClientRect().height + buttons[index].getBoundingClientRect().height + 18))));
+    const observer = new ResizeObserver(measure);
+    [...contents, ...buttons].forEach(element => observer.observe(element));
+    measure();
+    return () => observer.disconnect();
+  }, [language]);
   return <section className="section programme" id="programme" aria-labelledby="programme-title">
     <p className="eyebrow">PROGRAMME</p><h2 id="programme-title">{english?'Three days of connection.':'Trois jours de rencontres.'}</h2>
     <p className="programme-intro">{english?'Three days, three unique venues, one unforgettable MUN experience.':'Trois jours, trois lieux uniques, une expérience MUN inoubliable.'}</p>
-    <div className="programme-grid">{days.map((day,index)=><DayCard key={day.name} day={day} index={index} english={english}/>)}</div>
+    <div className="programme-grid" ref={gridRef} style={{'--programme-presentation-height': `${presentationHeight}px`}}>{days.map((day,index)=><DayCard key={day.name} day={day} index={index} english={english}/>)}</div>
   </section>;
 }

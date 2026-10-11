@@ -21,7 +21,7 @@ try {
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
- for(const width of [320,360,390,430,768,1024,1440]) {
+ for(const width of [320,360,390,430,768,1024,1280,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
@@ -30,6 +30,11 @@ try {
    assert.equal(await evaluate("document.querySelectorAll('#programme .programme-slots li').length"),26);
    assert.equal(await evaluate("getComputedStyle(document.querySelector('.programme-grid')).gridTemplateColumns.split(' ').length"),width<=640?1:width<=1000?2:3);
    const before=await evaluate("[...document.querySelectorAll('.programme-card')].map(e=>e.getBoundingClientRect().height)");
+   const closed=await evaluate(`(()=>{return [...document.querySelectorAll('.programme-card')].map(card=>{const r=card.getBoundingClientRect(),photo=card.querySelector('.programme-photo').getBoundingClientRect(),button=card.querySelector('.programme-day-toggle').getBoundingClientRect(),copy=card.querySelector('.programme-card-copy');return {height:r.height,width:r.width,top:r.top,photo:photo.height,button:button.top,bottomGap:r.bottom-button.bottom,padding:getComputedStyle(copy).padding};});})()`);
+   if(width>1000){
+     for(const card of closed){assert.ok(Math.abs(card.height-closed[0].height)<1,'Equal closed heights');assert.ok(Math.abs(card.width-closed[0].width)<1,'Equal widths');assert.ok(Math.abs(card.photo-closed[0].photo)<1,'Equal photos');assert.ok(Math.abs(card.button-closed[0].button)<1,'Aligned buttons');assert.ok(Math.abs(card.bottomGap-closed[0].bottomGap)<1,'Equal bottom spacing');assert.equal(card.padding,closed[0].padding);}
+   }
+   assert.ok(await evaluate("[...document.querySelectorAll('.programme-presentation-content h3,.programme-venue,.programme-description')].every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Unclipped presentation text');
    for(let day=0;day<3;day++) {
     await evaluate(`document.querySelector('#programme-tab-${day}').click()`);await pause();
     assert.equal(await evaluate("document.querySelectorAll('.programme-day-panel:not([hidden])').length"),day+1);
@@ -40,9 +45,9 @@ try {
     assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
     if(day===0&&width>1000){const after=await evaluate("[...document.querySelectorAll('.programme-card')].map(e=>e.getBoundingClientRect().height)");assert.equal(after[1],before[1]);assert.equal(after[2],before[2]);assert.ok(after[0]>before[0]);}
    }
-   if(language==='fr'){
+   if(language==='fr'||width===1440){
     await evaluate("window.scrollTo({top:scrollY+document.querySelector('.programme-grid').getBoundingClientRect().top-document.querySelector('header').offsetHeight-16,behavior:'instant'})");await pause();
-    const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`programme-cards-${width}.png`),Buffer.from(capture.data,'base64'));
+    const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`programme-cards-${width}-${language}.png`),Buffer.from(capture.data,'base64'));
    }
    for(let day=0;day<3;day++){
     await evaluate(`document.querySelector('#programme-tab-${day}').focus()`);
