@@ -50,9 +50,14 @@ try {
    await call('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32});
    await call('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32});await pause();
    assert.ok(await evaluate("document.querySelector('#committee-details-un-women').hidden"));
-   for(const [index,count] of [[1,6],[2,8],[0,15]]) {
+   for(const [index,count] of [[1,6],[2,8],[3,1],[0,15]]) {
     await evaluate(`document.querySelectorAll('.committee-filters button')[${index}].click()`);await pause();
     assert.equal(await evaluate("document.querySelectorAll('.committee-card').length"),count);
+    if(index===3){
+      assert.equal(await evaluate("document.querySelector('.committee-logo img').getAttribute('src')"),'/assets/committees/mps-transparent.png');
+      assert.equal(await evaluate("document.querySelectorAll('.committee-filters button')[3].getAttribute('aria-label')"),language==='fr'?'Comité marocain':'Moroccan committee');
+      assert.equal(await evaluate("getComputedStyle(document.querySelectorAll('.committee-filters button')[3]).backgroundColor"),'rgb(121, 14, 18)');
+    }
     assert.equal(await evaluate(`document.querySelectorAll('.committee-filters button')[${index}].getAttribute('aria-pressed')`),'true');
    }
    assert.ok(await evaluate("Array.from(document.querySelectorAll('.committee-meta,.committee-toggle')).every(e=>e.scrollWidth<=e.clientWidth)"),'Card text overflow');

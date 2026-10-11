@@ -44,6 +44,21 @@ try {
    assert.equal(await evaluate("document.querySelectorAll('.board-department-label').length"),10);
    assert.ok(await evaluate("[...document.querySelectorAll('.board-card h3,.board-card p')].every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Clipped text');
    assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
+   assert.ok(await evaluate("[...document.querySelectorAll('.board-grid .board-card,.board-leaders,.board-department')].every(e=>{const s=getComputedStyle(e);return s.borderTopColor==='rgb(184, 144, 88)'&&s.borderRadius==='12px'&&s.boxShadow.includes('0.06');})"),'Uniform gold frames');
+   assert.ok(await evaluate("[...document.querySelectorAll('.board-leaders .board-card + .board-card')].every(e=>getComputedStyle(e).borderLeftColor==='rgb(184, 144, 88)')"),'Gold leader separators');
+   const staff=await evaluate("(()=>{const e=document.querySelector('#staff .staff-button'),s=getComputedStyle(e);return {href:e.href,target:e.target,rel:e.rel,color:s.color,background:s.backgroundColor,weight:s.fontWeight,radius:s.borderRadius,shadow:s.boxShadow};})()");
+   assert.equal(staff.background,'rgb(121, 14, 18)');assert.equal(staff.color,'rgb(255, 255, 255)');assert.equal(staff.weight,'600');assert.equal(staff.radius,'10px');assert.notEqual(staff.shadow,'none');assert.equal(staff.target,'_blank');assert.ok(staff.rel.includes('noopener'));assert.ok(staff.href.includes('docs.google.com/forms/'));
+   await evaluate("document.querySelector('#staff .staff-button').focus()");
+   assert.ok(await evaluate("document.querySelector('#staff .staff-button').matches(':focus-visible')&&getComputedStyle(document.querySelector('#staff .staff-button')).outlineStyle==='solid'"),'Staff keyboard focus');
+   if(language==='fr'&&(width===390||width===1440)){
+    await evaluate("window.scrollTo({top:scrollY+document.querySelector('#staff').getBoundingClientRect().top-document.querySelector('header').offsetHeight-16,behavior:'instant'})");await pause();
+    const rect=await evaluate("(()=>{const r=document.querySelector('#staff').getBoundingClientRect();return {x:r.left+scrollX,y:r.top+scrollY,width:r.width,height:r.height,scale:1};})()");
+    const shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:rect});await writeFile(path.join(directory,`staff-refined-${width}.png`),Buffer.from(shot.data,'base64'));
+    const point=await evaluate("(()=>{const r=document.querySelector('#staff .staff-button').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()");
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point});await new Promise(r=>setTimeout(r,300));
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('#staff .staff-button')).backgroundColor"),'rgb(101, 11, 15)','Staff hover');
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0});await new Promise(r=>setTimeout(r,300));
+   }
    const grids=await evaluate("[...document.querySelectorAll('.board-grid')].map(grid=>{const g=grid.getBoundingClientRect();return {center:(g.left+g.right)/2,cards:[...grid.children].map(e=>{const r=e.getBoundingClientRect();return {top:r.top,width:r.width,center:(r.left+r.right)/2};})};})");
    for(const grid of grids){const [a,b,c]=grid.cards;assert.ok(Math.abs(a.top-b.top)<1&&Math.abs(a.width-b.width)<1);if(c&&width<=760){assert.ok(c.top>a.top);assert.ok(Math.abs(c.width-a.width)<1&&Math.abs(c.center-grid.center)<1);}if(c&&width>760)assert.ok(Math.abs(c.top-a.top)<1);}
    if(language==='fr'){

@@ -38,14 +38,14 @@ export default function Committees() {
   const english = language === 'en';
   const [filter,setFilter] = useState('all');
   const [openId,setOpenId] = useState(null);
-  const filtered = committees.filter(committee => filter === 'all' || committee.debateLanguage === filter);
+  const filtered = committees.filter(committee => filter === 'all' || (filter === 'ma' ? committee.acronym === 'MPS' : committee.debateLanguage === filter));
   return <section id="comites" className="section committees">
     <div className="section-heading">
       <div><p className="eyebrow">{t('02 / COMITÉS & ACADEMICS')}</p><h2>{t('Chaque débat ouvre')}<br />{t('une nouvelle perspective.')}</h2></div>
       <p>{t('Géopolitique, économie, enjeux humanitaires : explorez la diplomatie à travers des débats et la rédaction de résolutions.')}</p>
     </div>
     <div className="committee-filters" role="group" aria-label={english ? 'Filter by debate language' : 'Filtrer par langue de débat'}>
-      {[['all',english?'All':'Tous'],['fr',english?'French':'Français'],['en',english?'English':'Anglais']].map(([value,label]) => <button type="button" key={value} aria-pressed={filter===value} aria-controls="committee-grid" onClick={() => {setFilter(value);setOpenId(null);}}>{value === 'all' ? label : <Flag value={value} english={english} />}</button>)}
+      {[['all',english?'All':'Tous'],['fr',english?'French':'Français'],['en',english?'English':'Anglais'],['ma',english?'Moroccan committee':'Comité marocain']].map(([value,label]) => <button type="button" key={value} aria-label={label} aria-pressed={filter===value} aria-controls="committee-grid" onClick={() => {setFilter(value);setOpenId(null);}}>{value === 'all' ? label : <Flag value={value} english={english} />}</button>)}
     </div>
     <ul className="committee-grid" id="committee-grid">{filtered.map(committee => <CommitteeCard key={committee.id} committee={committee} language={language} open={openId===committee.id} onToggle={() => setOpenId(current => current===committee.id ? null : committee.id)} />)}</ul>
     <a href="/#packs" className="text-link committee-registration">{t('Préparer mon inscription')} <ArrowUpRight /></a>
