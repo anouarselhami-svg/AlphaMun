@@ -20,7 +20,7 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
- const expected=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Lailla Addab','Yasmine Bentaleb','Adam Dkouik','Zineb Maftah','Lina Sbaybi','Nidal Hammioui','Meryem Hajji','Asmae Ajbade','Yasmine Alaoui'];
+ const expected=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Lailla Addab','Yasmine Bentaleb','Adam Dekiouak','Zineb Maftah','Lina Sbaybi','Nidal Hammioui','Meryem Hajji','Asmae Ajbade','Yasmine Alaoui'];
  const fr=['Présidente','Vice-présidente','Secrétaire général','Responsable des affaires académiques','Responsable des comités','Responsable des comités','Responsable du staff','Responsable des affaires des délégués','Coordinatrice de l’événement','Responsable de la communication','Responsable des médias','Responsable des partenariats','Trésorière'];
  const en=['President','Vice-President','Secretary-General','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Staff','Head of Delegate Affairs','Event Coordinator','Head of Communication','Head of Media','Head of Sponsorships','Treasurer'];
  const key=async(k,c,n)=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key:k,code:c,windowsVirtualKeyCode:n,...(k==='Enter'?{text:'\r'}:{})});await call('Input.dispatchKeyEvent',{type:'keyUp',key:k,code:c,windowsVirtualKeyCode:n});await pause();};

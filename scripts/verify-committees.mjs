@@ -20,7 +20,7 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
- const names=['INTERPOL','INTERSS','UN WOMEN','AU PSC','ICJ','UNOOSA','UE','UNSC / CSNU','IAIGC','OMS','ECOSOC','UNESCO','DISEC','MPS'];
+ const names=['INTERPOL','INTERSS','UN WOMEN','ICJ','AU PSC','UNOOSA','UNICEF','UNODC','CSNU','OMS','CIGIA','ECOSOC','UNESCO','UE','MPS'];
  for(const width of [320,360,390,430,900,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
@@ -28,21 +28,21 @@ try {
    assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.committee-toggle')).map(e=>e.getAttribute('aria-label').replace(/^(Show details for|Afficher les détails de) /,''))"),names);
    assert.equal(await evaluate("document.querySelectorAll('.committee-details:not([hidden])').length"),0);
    assert.equal(await evaluate("document.querySelectorAll('.committee-card .committee-meta,.committee-crisis,.committee-card > h3').length"),0);
-   assert.equal(await evaluate("document.querySelectorAll('.committee-logo img').length"),12);
-   assert.equal(await evaluate("document.querySelectorAll('.committee-logo-missing').length"),2);
-   assert.deepEqual(await evaluate("[...document.querySelectorAll('.committee-controls .committee-flag')].map(e=>e.dataset.country)"),['en','en','en','en','en','en','fr','fr','fr','fr','fr','fr','fr','ma']);
+   assert.equal(await evaluate("document.querySelectorAll('.committee-logo img').length"),15);
+   assert.equal(await evaluate("document.querySelectorAll('.committee-logo-missing').length"),0);
+   assert.deepEqual(await evaluate("[...document.querySelectorAll('.committee-controls .committee-flag')].map(e=>e.dataset.country)"),['en','en','en','en','en','en','en','en','fr','fr','fr','fr','fr','fr','ma']);
    assert.ok(await evaluate("[...document.querySelectorAll('.committee-flag')].every(e=>e.getAttribute('role')==='img'&&e.getAttribute('aria-label'))"));
    assert.ok(await evaluate("[...document.querySelectorAll('.committee-logo img')].every(e=>e.alt&&getComputedStyle(e).objectFit==='contain')"));
    assert.equal(await evaluate("document.querySelectorAll('.committee-crisis').length"),0);
    assert.equal(await evaluate("getComputedStyle(document.querySelector('.committee-grid')).gridTemplateColumns.split(' ').length"),width<=760?2:width>=1200?4:3);
-   for(let i=0;i<14;i++) {
+   for(let i=0;i<15;i++) {
     await evaluate(`document.querySelectorAll('.committee-toggle')[${i}].click()`);await pause();
     assert.equal(await evaluate("document.querySelectorAll('.committee-details:not([hidden])').length"),1);
     assert.equal(await evaluate(`document.querySelectorAll('.committee-toggle')[${i}].getAttribute('aria-expanded')`),'true');
     assert.ok(await evaluate(`document.getElementById(document.querySelectorAll('.committee-toggle')[${i}].getAttribute('aria-controls'))!==null`));
     assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
    }
-   await evaluate("document.querySelectorAll('.committee-toggle')[13].click();document.querySelectorAll('.committee-toggle')[2].focus()");
+   await evaluate("document.querySelectorAll('.committee-toggle')[14].click();document.querySelectorAll('.committee-toggle')[2].focus()");
    await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
    await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});await pause();
    assert.ok(await evaluate("!document.querySelector('#committee-details-un-women').hidden"));
@@ -50,7 +50,7 @@ try {
    await call('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32});
    await call('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32});await pause();
    assert.ok(await evaluate("document.querySelector('#committee-details-un-women').hidden"));
-   for(const [index,count] of [[1,7],[2,6],[0,14]]) {
+   for(const [index,count] of [[1,6],[2,8],[0,15]]) {
     await evaluate(`document.querySelectorAll('.committee-filters button')[${index}].click()`);await pause();
     assert.equal(await evaluate("document.querySelectorAll('.committee-card').length"),count);
     assert.equal(await evaluate(`document.querySelectorAll('.committee-filters button')[${index}].getAttribute('aria-pressed')`),'true');
@@ -64,6 +64,6 @@ try {
   await new Promise(r=>setTimeout(r,500));
   assert.ok(await evaluate("[...document.querySelectorAll('.committee-logo img')].every(e=>e.complete&&e.naturalWidth>0)"),'Logo loading');
   const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`committees-${width}.png`),Buffer.from(capture.data,'base64'));
-  console.log(`${width}px: 14 committees, FR/EN, 2/3/4 columns, exclusive disclosure, keyboard/ARIA, language filters, topic, no overflow; programme/board/registration preserved.`);
+  console.log(`${width}px: 15 committees, FR/EN, 2/3/4 columns, exclusive disclosure, keyboard/ARIA, language filters, topic, no overflow; programme/board/registration preserved.`);
  }
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}

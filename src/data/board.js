@@ -12,7 +12,7 @@ export const boardDepartments = [
     member('Yasmine Bentaleb', 'Responsable des comités', 'Head of Committees'),
   ] },
   { id: 'logistics', name: { fr: 'Département logistique', en: 'Logistics Department' }, members: [
-    member('Adam Dkouik', 'Responsable du staff', 'Head of Staff'),
+    member('Adam Dekiouak', 'Responsable du staff', 'Head of Staff'),
     member('Zineb Maftah', 'Responsable des affaires des délégués', 'Head of Delegate Affairs'),
     member('Lina Sbaybi', 'Coordinatrice de l’événement', 'Event Coordinator'),
   ] },
