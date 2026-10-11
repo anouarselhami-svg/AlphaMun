@@ -24,7 +24,7 @@ try {
  const expectedNames=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Laila Addab','Yasmine Bentaleb','Nidal ElHammioui','Meryem Hajji','Adam Dekiouak','Asmae Ajabbade','Yasmine Alaoui'];
  const fr=['Présidente','Vice-présidente','Secrétaire général','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Communication','Head of Media','Head of Staff','Head of Sponsorships','Trésorière'];
  const en=['President','Vice-President','Secretary-General',...fr.slice(3,10),'Treasurer'];
- for(const width of [320,390,430,768,1024,1440]) {
+ for(const width of [320,360,390,430,768,1024,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
@@ -36,7 +36,24 @@ try {
    assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.board-avatar')).map(e=>e.textContent)"),['HEK','RA','ML','MH','LA','YB','NE','MH','AD','AA','YA']);
    assert.ok(await evaluate("Array.from(document.querySelectorAll('.board-card h3,.board-card p')).every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Clipped name or role');
    assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'Horizontal overflow');
-   assert.equal(await evaluate("getComputedStyle(document.querySelector('.board-grid')).gridTemplateColumns.split(' ').length"),width<=540?1:width<=1000?2:3);
+   assert.equal(await evaluate("getComputedStyle(document.querySelector('.board-grid')).gridTemplateColumns.split(' ').length"),width<=1000?2:3);
+   const geometry=await evaluate(`(()=>{
+     const cards=[...document.querySelectorAll('.board-card')].map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};});
+     const grid=document.querySelector('.board-grid').getBoundingClientRect();
+     return {cards,center:(grid.left+grid.right)/2,avatars:[...document.querySelectorAll('.board-avatar')].map(e=>e.getBoundingClientRect().width),overlap:cards.some((a,i)=>cards.slice(i+1).some(b=>Math.min(a.right,b.right)>Math.max(a.left,b.left)+1&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+1))};
+   })()`);
+   assert.ok(!geometry.overlap,'Overlapping cards');
+   if(width<=540) {
+     assert.ok(geometry.avatars.every(size=>size===56),'Mobile avatar diameter');
+     for(let row=0;row<5;row++) {
+       const [a,b]=geometry.cards.slice(row*2,row*2+2);
+       assert.ok(Math.abs(a.top-b.top)<1,'Two members per row');
+       assert.ok(Math.abs(a.width-b.width)<1,'Equal card widths');
+     }
+     const last=geometry.cards[10];
+     assert.ok(Math.abs(last.width-geometry.cards[0].width)<1,'Last card width');
+     assert.ok(Math.abs((last.left+last.right)/2-geometry.center)<1,'Last member centered');
+   } else assert.ok(geometry.avatars.every(size=>size===88),'Desktop/tablet avatar preserved');
   }
   await evaluate("document.querySelector('#bureau').scrollIntoView({behavior:'instant',block:'start'})");await pause();
   const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});

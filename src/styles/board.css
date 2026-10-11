@@ -5,4 +5,11 @@
 .board-card h3 {font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;line-height:1.4;margin:0 0 10px;overflow-wrap:anywhere}
 .board-card p {font-size:.95rem;line-height:1.6;margin:0;overflow-wrap:anywhere}
 @media(max-width:1000px){.board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){.board-grid{grid-template-columns:1fr;gap:16px}.board-card{padding:24px 20px}}
+@media(max-width:540px){
+  .board-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:24px;align-items:start}
+  .board-card {padding:14px 8px}
+  .board-avatar {width:56px;height:56px;margin-bottom:12px;font-size:20px}
+  .board-card h3 {font-size:1rem;line-height:1.35;margin-bottom:6px;overflow-wrap:normal;word-break:normal}
+  .board-card p {font-size:.8rem;line-height:1.45;overflow-wrap:normal;word-break:normal}
+  .board-card:last-child:nth-child(odd) {grid-column:1 / -1;justify-self:center;width:calc((100% - 10px) / 2)}
+}
