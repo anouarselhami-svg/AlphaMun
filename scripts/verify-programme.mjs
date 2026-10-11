@@ -58,7 +58,7 @@ try {
  console.log('Checking whole-site language switching');
  await evaluate(`document.querySelector('.site-language button:last-child').click()`);await pause();
  assert.equal(await evaluate('document.documentElement.lang'),'en');
- for(const [selector,expected] of [['#accueil','Become a delegate'],['#histoire','A world to understand.'],['#comites','Every debate opens'],['#packs','Choose this package'],['#programme','Three days of connection.'],['#bureau','13 dedicated members.'],['#staff','Join the staff'],['#faq','What is a MUN?'],['#contact','Your name'],['footer','Back to top']])assert.ok(await evaluate(`document.querySelector('${selector}').textContent.includes(${JSON.stringify(expected)})`),selector);
+ for(const [selector,expected] of [['#accueil','Become a delegate'],['#histoire','A world to understand.'],['#comites','Every debate opens'],['#packs','Choose this package'],['#programme','Three days of connection.'],['#bureau','Our organising team'],['#staff','Join the staff'],['#faq','What is a MUN?'],['#contact','Your name'],['footer','Back to top']])assert.ok(await evaluate(`document.querySelector('${selector}').textContent.includes(${JSON.stringify(expected)})`),selector);
  assert.ok(await evaluate(`document.querySelector('.countdown').textContent.includes('DAYS')`));
  assert.ok(await evaluate(`document.querySelector('[name="nom"]').placeholder==='Your name'`));
  await call('Page.reload');await pause();await pause();assert.equal(await evaluate('document.documentElement.lang'),'en');

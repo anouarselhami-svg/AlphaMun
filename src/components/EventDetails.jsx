@@ -1,4 +1,5 @@
 import Programme from './Programme';
+import Board from './Board';
 import { useLanguage } from '../i18n/LanguageContext';
 import { config } from '../config';
 
@@ -14,10 +15,9 @@ function StaffSection() {
 }
 
 export default function EventDetails() {
-  const { t, language } = useLanguage();
   return <>
     <Programme />
-    <section className="section" id="bureau"><p className="eyebrow">{t("LE BUREAU")}</p><h2>{t("13 membres engagés.")}</h2><p>{t("Les noms, fonctions et portraits seront présentés après confirmation.")}</p></section>
+    <Board />
     <StaffSection />
   </>;
 }

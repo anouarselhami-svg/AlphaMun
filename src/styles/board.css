@@ -1,0 +1,8 @@
+﻿.board-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;padding:0;margin:36px 0 0}
+.board-card {min-width:0;padding:28px 20px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--wine);text-align:center}
+.board-avatar {display:flex;align-items:center;justify-content:center;width:88px;height:88px;margin:0 auto 20px;border:2px solid var(--gold);border-radius:50%;background:var(--surface);overflow:hidden;font-family:'GFS Didot',Georgia,serif;font-size:28px}
+.board-avatar img {display:block;width:100%;height:100%;object-fit:cover}
+.board-card h3 {font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;line-height:1.4;margin:0 0 10px;overflow-wrap:anywhere}
+.board-card p {font-size:.95rem;line-height:1.6;margin:0;overflow-wrap:anywhere}
+@media(max-width:1000px){.board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.board-grid{grid-template-columns:1fr;gap:16px}.board-card{padding:24px 20px}}
