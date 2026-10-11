@@ -1,4 +1,4 @@
-﻿import { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { config } from '../config';
 import { registrationCommittees, registrationFields } from '../services/registration-schema';
 import { submitRegistration } from '../services/registration';
@@ -21,6 +21,17 @@ export default function Registration({pack,onChoosePack}) {
     prenom:t('Prénom','First name'),nom:t('Nom','Last name'),age:t('Âge','Age'),email:'Email',telephone:t('Numéro de téléphone','Phone number'),contact_parent:t('Contact d’un parent ou tuteur','Parent or guardian phone'),ville:t('Ville de résidence','City of residence'),etablissement:t('Établissement / école / université','Institution / school / university'),niveau:t('Niveau scolaire ou classe','Grade or education level'),
     comite_choix_1:t('Premier choix','First choice'),comite_choix_2:t('Deuxième choix','Second choice'),comite_choix_3:t('Troisième choix','Third choice'),participations_mun:t('Nombre de participations à un MUN','Number of MUN participations'),experience_details:t('Décrivez brièvement votre expérience MUN : postes, distinctions, etc.','Briefly describe your MUN experience: roles, awards, etc.'),motivation:t('Pourquoi souhaitez-vous participer à Alpha MUN et être affecté(e) à votre comité de premier choix ?','Why do you want to participate in Alpha MUN and be assigned to your first-choice committee?'),attentes:t('Qu’espérez-vous tirer de cette expérience ?','What do you hope to gain from this experience?'),pack:t('Pack choisi','Selected package'),logistique:t('Logistique et besoins particuliers : hébergement, restrictions alimentaires, etc.','Logistics and special needs: accommodation, dietary restrictions, etc.'),
     confirmation_pack:t('Je reconnais avoir choisi ce pack et j’en assume les conditions.','I acknowledge choosing this package and accept its conditions.'),consentement:t('J’accepte l’utilisation de mes informations par YouthGlobalClub pour traiter mon inscription.','I agree to YouthGlobalClub using my information to process my registration.'),code_conduite:t('J’accepte de me conformer aux règles et au code de conduite d’AMUN.','I agree to comply with AMUN rules and code of conduct.'),exactitude:t('Je confirme que les informations fournies sont exactes.','I confirm that the information provided is accurate.'),
+  };
+  const placeholders = {
+    prenom: t('Votre prénom', 'Your first name'),
+    nom: t('Votre nom de famille', 'Your last name'),
+    age: t('Ex. 18', 'E.g. 18'),
+    email: t('Ex. nom@example.com', 'E.g. name@example.com'),
+    telephone: t('Ex. 06 XX XX XX XX', 'E.g. 06 XX XX XX XX'),
+    contact_parent: t('Numéro de téléphone du parent ou tuteur', 'Parent or guardian phone number'),
+    ville: t('Ex. Kénitra', 'E.g. Kénitra'),
+    etablissement: t('Nom de votre établissement', 'Name of your institution'),
+    niveau: t('Ex: 1er bac, 2e bac', 'E.g. first or second year of baccalaureate'),
   };
   const languageName = value => ({en:t('Anglais','English'),fr:t('Français','French'),ary:t('Dialecte marocain','Moroccan dialect')})[value];
   const packName = value => value==='500'?t('Pack Normal — 500 MAD','Normal Package — 500 MAD'):value==='1500'?t('Pack Premium — 1 500 MAD','Premium Package — 1 500 MAD'):t('Choisissez votre pack','Choose your package');
@@ -60,7 +71,7 @@ export default function Registration({pack,onChoosePack}) {
   }
   function field(name,{long=false,type='text',options,help}={}) {
     const props={id:name,name,value:data[name],required:true,onChange:event=>update(name,event.target.value),'aria-invalid':!!errors[name],'aria-describedby':[help?`${name}-help`:'',errors[name]?`${name}-error`:''].filter(Boolean).join(' ')||undefined};
-    return <label key={name} className={long||name.startsWith('comite_')?'wide':''} htmlFor={name}><span>{labels[name]} *</span>{options?<select {...props}><option value="">{t('Sélectionner','Select')}</option>{options.map(([value,label])=><option key={value} value={value} disabled={name.startsWith('comite_')&&[1,2,3].some(i=>`comite_choix_${i}`!==name&&data[`comite_choix_${i}`]===value)}>{label}</option>)}</select>:long?<textarea {...props} rows={4}/>:<input {...props} type={type} min={type==='number'?(name==='age'?1:0):undefined} step={type==='number'?1:undefined} inputMode={['age','participations_mun'].includes(name)?'numeric':undefined} autoComplete={({prenom:'given-name',nom:'family-name',email:'email',telephone:'tel',ville:'address-level2'})[name]}/>} {help&&<small id={`${name}-help`}>{help}</small>}{errors[name]&&<span id={`${name}-error`} className="field-error" role="alert">{errors[name]}</span>}</label>;
+    return <label key={name} className={long||name.startsWith('comite_')?'wide':''} htmlFor={name}><span>{labels[name]} *</span>{options?<select {...props}><option value="">{t('Sélectionner','Select')}</option>{options.map(([value,label])=><option key={value} value={value} disabled={name.startsWith('comite_')&&[1,2,3].some(i=>`comite_choix_${i}`!==name&&data[`comite_choix_${i}`]===value)}>{label}</option>)}</select>:long?<textarea {...props} rows={4}/>:<input {...props} placeholder={placeholders[name]} type={type} min={type==='number'?(name==='age'?1:0):undefined} step={type==='number'?1:undefined} inputMode={['age','participations_mun'].includes(name)?'numeric':undefined} autoComplete={({prenom:'given-name',nom:'family-name',email:'email',telephone:'tel',ville:'address-level2'})[name]}/>} {help&&<small id={`${name}-help`}>{help}</small>}{errors[name]&&<span id={`${name}-error`} className="field-error" role="alert">{errors[name]}</span>}</label>;
   }
   function summary(values,full=false) {
     return <dl className="registration-recap">{registrationFields.filter(name=>full||['prenom','nom','ville','pack','comite_choix_1','comite_choix_2','comite_choix_3'].includes(name)).map(name=><div key={name}><dt>{labels[name]}</dt><dd>{name==='pack'?packName(values[name]):confirmations.includes(name)?t('Oui','Yes'):values[name]}</dd></div>)}</dl>;
