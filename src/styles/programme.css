@@ -40,3 +40,6 @@
   .programme-card .programme-slots {margin-top:16px}
 }
 @media(prefers-reduced-motion:reduce){.programme-day-toggle .icon{transition:none}}
+/* Secondary hero actions wrap without clipping their labels. */
+.hero-actions {flex-wrap:wrap;align-items:center;row-gap:12px}
+.hero-actions .text-link {white-space:nowrap;color:var(--wine)}

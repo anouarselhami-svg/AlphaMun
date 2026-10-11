@@ -13,12 +13,24 @@ function AssemblyDrawing() {
 }
 export default function Hero() {
   const { t, language } = useLanguage();
+  const viewSchedule = event => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const programme = document.getElementById('programme');
+    if (!programme) return;
+    event.preventDefault();
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 0;
+    window.history.pushState(null, '', '#programme');
+    window.scrollTo({
+      top: window.scrollY + programme.getBoundingClientRect().top - headerHeight - 16,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
+  };
   return <section className="hero" id="accueil">
     <div className="hero-copy">
       <p className="eyebrow"><span className="dot" />{t("LA JEUNESSE PREND LA PAROLE")}</p>
       <h1>{t("La parole")}<br />{t("devient")} <em>{t("action.")}</em></h1>
       <p className="intro">{t("Trois jours pour débattre, créer des liens et faire entendre votre voix. Entrez dans la peau d’un diplomate avec Alpha MUN.")}</p>
-      <div className="hero-actions"><a className="button" href="/#packs">{t("Devenir délégué")} <ArrowUpRight /></a><a className="text-link" href="#histoire">{t("Découvrir l’expérience")} <ArrowDown /></a></div>
+      <div className="hero-actions"><a className="button" href="/#packs">{t("Devenir délégué")} <ArrowUpRight /></a><a className="text-link" href="#histoire">{t("Découvrir l’expérience")} <ArrowDown /></a><a className="text-link schedule-link" href="#programme" onClick={viewSchedule}>{language === 'en' ? 'View the schedule' : 'Voir le planning'} <ArrowDown /></a></div>
       <div className="hero-foot"><div className="hero-date"><span className="date-number">{t("22, 23 et 24 janvier")}</span><span><b>{t("KÉNITRA, MAROC")}</b></span></div><span className="edition">{t("7 ans")}<small>{t("d’impact & de leadership")}</small></span></div>
     </div>
     <div className="hero-art">
