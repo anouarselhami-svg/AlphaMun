@@ -1,12 +1,12 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { boardMembers } from '../data/board';
-import { useDisclosure } from '../hooks/useDisclosure';
+import { ArrowDown } from './icons';
 
-function MemberCard({ member, language, hidden }) {
+function MemberCard({ member, language }) {
   const [failedPhoto, setFailedPhoto] = useState(null);
   const initials = member.name.split(/\s+/).map(part => part[0]).join('');
-  return <li className="board-card" hidden={hidden}>
+  return <li className="board-card">
     <div className="board-avatar" aria-hidden="true">
       {member.photo && failedPhoto !== member.photo
         ? <img src={member.photo} alt="" width="88" height="88" loading="lazy" onError={() => setFailedPhoto(member.photo)} />
@@ -19,11 +19,10 @@ function MemberCard({ member, language, hidden }) {
 
 export default function Board() {
   const { language, t } = useLanguage();
-  const { expanded, toggle, startRef } = useDisclosure();
-  return <section className="section board" id="bureau" aria-labelledby="board-title" ref={startRef}>
+  const [expanded, setExpanded] = useState(false);
+  return <section className="section board" id="bureau" aria-labelledby="board-title">
     <p className="eyebrow">{t('LE BUREAU')}</p>
-    <h2 id="board-title">{language === 'en' ? 'Our organising team' : 'Notre équipe organisatrice'}</h2>
-    <ul className="board-grid" id="board-members">{boardMembers.map((member, index) => <MemberCard key={member.name} member={member} language={language} hidden={!expanded && index >= 3} />)}</ul>
-    <button type="button" className="disclosure-button" aria-expanded={expanded} aria-controls="board-members" onClick={toggle}>{language === 'en' ? (expanded ? 'Show less of the team ↑' : 'View the whole team ↓') : (expanded ? 'Réduire l’équipe ↑' : 'Voir toute l’équipe ↓')}</button>
+    <h2 id="board-title"><button type="button" className="board-toggle" aria-expanded={expanded} aria-controls="board-members" onClick={() => setExpanded(current => !current)}><span>{language === 'en' ? 'Our organising team' : 'Notre équipe organisatrice'}</span><ArrowDown /></button></h2>
+    <ul className="board-grid" id="board-members" hidden={!expanded}>{boardMembers.map(member => <MemberCard key={member.name} member={member} language={language} />)}</ul>
   </section>;
 }

@@ -1,6 +1,11 @@
 ﻿/* Compact sections retain their original typography. */
 .section {padding-top:clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px)}
-.programme-slots li[hidden],.board-card[hidden] {display:none}
-.disclosure-button {display:block;max-width:100%;margin:24px auto 0;padding:12px 18px;min-height:44px;border:1px solid var(--gold);border-radius:6px;background:var(--paper);color:var(--wine);font:inherit;font-weight:600;line-height:1.5;cursor:pointer}
-.disclosure-button:hover {background:var(--surface);border-color:var(--wine)}
-.disclosure-button:focus-visible {outline:3px solid var(--wine);outline-offset:4px}
+.board-grid[hidden],.programme-schedule [role="region"][hidden] {display:none}
+.programme-tabs button {display:flex;align-items:center;justify-content:center;gap:6px}
+.programme-tabs button[aria-expanded="true"] {background:var(--wine);color:var(--paper);font-weight:700}
+.board-toggle {display:inline;max-width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer}
+.board-toggle .icon,.programme-tabs .icon {display:inline-block;width:18px;height:18px;flex-shrink:0;vertical-align:middle;transition:transform .2s}
+.board-toggle .icon {margin-left:10px;vertical-align:baseline}
+.board-toggle[aria-expanded="true"] .icon,.programme-tabs [aria-expanded="true"] .icon {transform:rotate(180deg)}
+.board-toggle:focus-visible {outline:3px solid var(--wine);outline-offset:6px;border-radius:3px}
+@media(prefers-reduced-motion:reduce){.board-toggle .icon,.programme-tabs .icon{transition:none}}

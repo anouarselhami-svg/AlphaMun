@@ -20,46 +20,43 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
- const slots="document.querySelectorAll('[role=tabpanel]:not([hidden]) .programme-slots li:not([hidden])').length";
- const members="document.querySelectorAll('.board-card:not([hidden])').length";
- for(const width of [320,390,768,1440]) {
+ const panel="document.querySelectorAll('.programme-schedule [role=region]:not([hidden])').length";
+ const press=async(key,code,n)=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,windowsVirtualKeyCode:n,...(key==='Enter'?{text:'\r'}:{})});await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:n});await pause();};
+ for(const width of [320,360,390,430,768,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
-   assert.equal(await evaluate(members),3);
+   assert.equal(await evaluate(panel),0);
+   assert.ok(await evaluate("document.querySelector('#board-members').hidden"));
+   assert.equal(await evaluate("document.querySelectorAll('.disclosure-button').length"),0);
+   assert.equal(await evaluate("document.querySelectorAll('.programme-photo img').length"),3);
+   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
    for(let day=0;day<3;day++) {
     await evaluate(`document.querySelector('#programme-tab-${day}').click()`);await pause();
-    assert.equal(await evaluate(slots),3);
-    assert.equal(await evaluate("document.querySelector('#programme .disclosure-button').getAttribute('aria-expanded')"),'false');
-    assert.equal(await evaluate("document.querySelector('#programme .disclosure-button').textContent"),language==='fr'?'Voir le programme complet ↓':'View the full programme ↓');
-    await evaluate("document.querySelector('#programme .disclosure-button').focus()");
-    await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
-    await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});await pause();
-    assert.equal(await evaluate(slots),[9,12,5][day]);
-    assert.equal(await evaluate("document.querySelector('#programme .disclosure-button').getAttribute('aria-expanded')"),'true');
-    assert.equal(await evaluate("document.querySelector('#programme .disclosure-button').textContent"),language==='fr'?'Réduire le programme ↑':'Show less of the programme ↑');
-    assert.ok(await evaluate("document.getElementById(document.querySelector('#programme .disclosure-button').getAttribute('aria-controls'))!==null"));
-    if(day<2) continue;
-    await evaluate("document.querySelector('#programme .disclosure-button').scrollIntoView({behavior:'instant',block:'center'});document.querySelector('#programme .disclosure-button').click()");await pause();
-    assert.equal(await evaluate(slots),3);
-    assert.ok(await evaluate("document.querySelector('.programme-schedule').getBoundingClientRect().top>=document.querySelector('header').getBoundingClientRect().height"),'Programme scroll restoration');
+    assert.equal(await evaluate(panel),1);
+    assert.equal(await evaluate("document.querySelector('.programme-schedule [role=region]:not([hidden])').id"),`programme-panel-${day}`);
+    assert.equal(await evaluate("document.querySelector('.programme-schedule [role=region]:not([hidden]) ol').children.length"),[9,12,5][day]);
+    assert.equal(await evaluate(`document.querySelector('#programme-tab-${day}').getAttribute('aria-expanded')`),'true');
+    assert.ok(await evaluate(`getComputedStyle(document.querySelector('#programme-tab-${day} .icon')).transform.includes('-1')`));
    }
-   assert.equal(await evaluate("document.querySelector('#bureau .disclosure-button').textContent"),language==='fr'?'Voir toute l’équipe ↓':'View the whole team ↓');
-   await evaluate("document.querySelector('#bureau .disclosure-button').click()");await pause();
-   assert.equal(await evaluate(members),11);
-   assert.equal(await evaluate("document.querySelector('#bureau .disclosure-button').getAttribute('aria-expanded')"),'true');
-   assert.equal(await evaluate("document.querySelector('#bureau .disclosure-button').textContent"),language==='fr'?'Réduire l’équipe ↑':'Show less of the team ↑');
-   await evaluate("document.querySelector('#bureau .disclosure-button').scrollIntoView({behavior:'instant',block:'center'});document.querySelector('#bureau .disclosure-button').focus()");
-   await call('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32});
-   await call('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32});await pause();
-   assert.equal(await evaluate(members),3);
-   assert.ok(await evaluate("document.querySelector('#bureau').getBoundingClientRect().top>=document.querySelector('header').getBoundingClientRect().height"),'Board scroll restoration');
-   assert.ok(await evaluate("document.activeElement.matches('#bureau .disclosure-button')"),'Focus retained');
-   assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'Overflow');
-   assert.ok(await evaluate("document.getElementById(document.querySelector('#bureau .disclosure-button').getAttribute('aria-controls'))!==null"));
+   await evaluate("document.querySelector('#programme-tab-2').focus()");
+   await press('Enter','Enter',13);assert.equal(await evaluate(panel),0);
+   await press(' ','Space',32);assert.equal(await evaluate(panel),1);
+   await press('Enter','Enter',13);assert.equal(await evaluate(panel),0);
+   assert.equal(await evaluate("document.querySelector('#programme-tab-2 .icon').getBoundingClientRect().height"),18);
+   const geometry=await evaluate(`(()=>{const button=document.querySelector('#programme-tab-2').getBoundingClientRect(),icon=document.querySelector('#programme-tab-2 .icon').getBoundingClientRect();return Math.abs((button.top+button.bottom)/2-(icon.top+icon.bottom)/2)})()`);
+   assert.ok(geometry<2,'Chevron vertical alignment');
+   await evaluate("document.querySelector('.board-toggle').focus()");await press('Enter','Enter',13);
+   assert.ok(await evaluate("!document.querySelector('#board-members').hidden"));
+   assert.equal(await evaluate("document.querySelectorAll('#board-members .board-card').length"),11);
+   assert.equal(await evaluate("document.querySelector('.board-toggle').getAttribute('aria-expanded')"),'true');
+   assert.equal(await evaluate("document.querySelector('.board-toggle').getAttribute('aria-controls')"),'board-members');
+   assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Overflow');
+   await press(' ','Space',32);assert.ok(await evaluate("document.querySelector('#board-members').hidden"));
+   assert.equal(await evaluate("document.querySelector('.board-toggle').getAttribute('aria-expanded')"),'false');
   }
-  await evaluate("document.querySelector('#bureau').scrollIntoView({behavior:'instant',block:'start'})");await pause();
-  const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`compact-${width}.png`),Buffer.from(capture.data,'base64'));
-  console.log(`${width}px: FR/EN expand/collapse, day reset, Enter/Space, ARIA, focus, scroll restoration, no overflow.`);
+  await evaluate("document.querySelector('#programme-tab-0').scrollIntoView({behavior:'instant',block:'center'})");await pause();
+  const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`chevrons-${width}.png`),Buffer.from(capture.data,'base64'));
+  console.log(`${width}px: FR/EN, initially closed, exclusive day opening, same-day closing, full content, Enter/Space, ARIA, chevrons, no overflow.`);
  }
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}

@@ -31,8 +31,8 @@ try {
  assert.equal(await evaluate("document.querySelectorAll('nav a[href=\"/#programme\"]').length"),1);
  for (let day=0;day<3;day++) {
    await evaluate(`document.querySelectorAll('.programme-tabs button')[${day}].click()`);await pause();
-   assert.equal(await evaluate("document.querySelector('.programme-tabs [aria-selected=true]').id"),`programme-tab-${day}`);
-   assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').id"),`programme-panel-${day}`);
+   assert.equal(await evaluate("document.querySelector('.programme-tabs [aria-expanded=true]').id"),`programme-tab-${day}`);
+   assert.equal(await evaluate("document.querySelector('[role=region]:not([hidden])').id"),`programme-panel-${day}`);
  }
  await evaluate("document.querySelector('#programme-tab-2').focus()");
  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight'});await pause();
@@ -50,7 +50,7 @@ try {
    const point=await evaluate(`(()=>{const r=document.querySelectorAll('.programme-tabs button')[${day}].getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
    await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
    await pause();await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await new Promise(r=>setTimeout(r,500));
-   assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').id"),`programme-panel-${day}`);
+   assert.equal(await evaluate("document.querySelector('[role=region]:not([hidden])').id"),`programme-panel-${day}`);
    assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'320px schedule overflow');
  }
  await call('Emulation.setTouchEmulationEnabled',{enabled:false});
