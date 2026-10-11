@@ -25,9 +25,15 @@ try {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click();document.querySelector('.committee-filters button').click()`);await pause();
-   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.committee-toggle span')).map(e=>e.textContent)"),names);
+   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.committee-toggle')).map(e=>e.getAttribute('aria-label').replace(/^(Show details for|Afficher les détails de) /,''))"),names);
    assert.equal(await evaluate("document.querySelectorAll('.committee-details:not([hidden])').length"),0);
-   assert.equal(await evaluate("document.querySelectorAll('.committee-crisis').length"),4);
+   assert.equal(await evaluate("document.querySelectorAll('.committee-card .committee-meta,.committee-crisis,.committee-card > h3').length"),0);
+   assert.equal(await evaluate("document.querySelectorAll('.committee-logo img').length"),12);
+   assert.equal(await evaluate("document.querySelectorAll('.committee-logo-missing').length"),2);
+   assert.deepEqual(await evaluate("[...document.querySelectorAll('.committee-controls .committee-flag')].map(e=>e.dataset.country)"),['en','en','en','en','en','en','fr','fr','fr','fr','fr','fr','fr','ma']);
+   assert.ok(await evaluate("[...document.querySelectorAll('.committee-flag')].every(e=>e.getAttribute('role')==='img'&&e.getAttribute('aria-label'))"));
+   assert.ok(await evaluate("[...document.querySelectorAll('.committee-logo img')].every(e=>e.alt&&getComputedStyle(e).objectFit==='contain')"));
+   assert.equal(await evaluate("document.querySelectorAll('.committee-crisis').length"),0);
    assert.equal(await evaluate("getComputedStyle(document.querySelector('.committee-grid')).gridTemplateColumns.split(' ').length"),width<=760?2:width>=1200?4:3);
    for(let i=0;i<14;i++) {
     await evaluate(`document.querySelectorAll('.committee-toggle')[${i}].click()`);await pause();
@@ -54,7 +60,9 @@ try {
    assert.equal(await evaluate("document.querySelectorAll('#programme .programme-slots li').length"),26);
    assert.equal(await evaluate("document.querySelectorAll('.board-card').length"),13);
   }
-  await evaluate("document.querySelector('.committee-filters').scrollIntoView({behavior:'instant',block:'center'})");await pause();
+  await evaluate("document.querySelectorAll('.committee-logo img').forEach(img=>img.loading='eager');document.querySelector('.committee-filters').scrollIntoView({behavior:'instant',block:'center'})");await pause();
+  await new Promise(r=>setTimeout(r,500));
+  assert.ok(await evaluate("[...document.querySelectorAll('.committee-logo img')].every(e=>e.complete&&e.naturalWidth>0)"),'Logo loading');
   const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`committees-${width}.png`),Buffer.from(capture.data,'base64'));
   console.log(`${width}px: 14 committees, FR/EN, 2/3/4 columns, exclusive disclosure, keyboard/ARIA, language filters, topic, no overflow; programme/board/registration preserved.`);
  }

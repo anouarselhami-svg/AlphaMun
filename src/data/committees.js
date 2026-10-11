@@ -1,4 +1,4 @@
-﻿// Debate language is independent from the site's display language.
+// Debate language is independent from the site's display language.
 // Supply logo URLs only after checking the acronym in the actual image.
 const rows = [
  ['INTERPOL','en',20,true,'Organisation internationale de police criminelle','International Criminal Police Organization','Facilite la coopération entre les polices pour lutter contre la criminalité internationale.','Facilitates cooperation between police forces to combat international crime.','S(1)'],
@@ -35,3 +35,15 @@ export const committeeVisualNotes = {
  'DISEC': 'No identified visual: use the acronym.',
  excluded: ['UNICEF', 'UNODC', '27 S'],
 };
+
+// Verified against the acronym visible in each supplied image.
+const committeeLogos = {
+ INTERPOL: 'interpol.jpg', INTERSS: 'interss.jpg', 'UN WOMEN': 'unwomen.jpg',
+ 'AU PSC': 'aupsc.jpg', ICJ: 'icj.jpg', UNOOSA: 'unoosa.jpg', UE: 'ue.jpg',
+ 'UNSC / CSNU': 'csnu.jpg', OMS: 'oms.jpg', ECOSOC: 'ecosoc.jpg',
+ UNESCO: 'unesco.jpg', MPS: 'mps.jpg',
+};
+for (const committee of committees) {
+ const filename = committeeLogos[committee.acronym];
+ committee.logo = filename ? `/assets/committees/${filename}` : null;
+}
