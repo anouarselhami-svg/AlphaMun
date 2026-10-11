@@ -1,14 +1,28 @@
-﻿// Set photo to a real portrait URL when supplied; null keeps the initials.
-export const boardMembers = [
-  { name: 'Hajar El Khachai', role: { fr: 'Présidente', en: 'President' }, photo: null },
-  { name: 'Rania Aqachmar', role: { fr: 'Vice-présidente', en: 'Vice-President' }, photo: null },
-  { name: 'Marouane Lrhoul', role: { fr: 'Secrétaire général', en: 'Secretary-General' }, photo: null },
-  { name: 'Miral Hatta', role: { fr: 'Head of Academic Affairs', en: 'Head of Academic Affairs' }, photo: null },
-  { name: 'Laila Addab', role: { fr: 'Head of Committees', en: 'Head of Committees' }, photo: null },
-  { name: 'Yasmine Bentaleb', role: { fr: 'Head of Committees', en: 'Head of Committees' }, photo: null },
-  { name: 'Nidal ElHammioui', role: { fr: 'Head of Communication', en: 'Head of Communication' }, photo: null },
-  { name: 'Meryem Hajji', role: { fr: 'Head of Media', en: 'Head of Media' }, photo: null },
-  { name: 'Adam Dekiouak', role: { fr: 'Head of Staff', en: 'Head of Staff' }, photo: null },
-  { name: 'Asmae Ajabbade', role: { fr: 'Head of Sponsorships', en: 'Head of Sponsorships' }, photo: null },
-  { name: 'Yasmine Alaoui', role: { fr: 'Trésorière', en: 'Treasurer' }, photo: null },
+﻿// Optional photo URLs can be supplied when real portraits become available.
+const member = (name, fr, en) => ({ name, role: { fr, en }, photo: null });
+export const boardLeaders = [
+  member('Hajar El Khachai', 'Présidente', 'President'),
+  member('Rania Aqachmar', 'Vice-présidente', 'Vice-President'),
+  member('Marouane Lrhoul', 'Secrétaire général', 'Secretary-General'),
 ];
+export const boardDepartments = [
+  { id: 'academic', name: { fr: 'Département académique', en: 'Academic Department' }, members: [
+    member('Miral Hatta', 'Responsable des affaires académiques', 'Head of Academic Affairs'),
+    member('Lailla Addab', 'Responsable des comités', 'Head of Committees'),
+    member('Yasmine Bentaleb', 'Responsable des comités', 'Head of Committees'),
+  ] },
+  { id: 'logistics', name: { fr: 'Département logistique', en: 'Logistics Department' }, members: [
+    member('Adam Dkouik', 'Responsable du staff', 'Head of Staff'),
+    member('Zineb Maftah', 'Responsable des affaires des délégués', 'Head of Delegate Affairs'),
+    member('Lina Sbaybi', 'Coordinatrice de l’événement', 'Event Coordinator'),
+  ] },
+  { id: 'social', name: { fr: 'Département social', en: 'Social Department' }, members: [
+    member('Nidal Hammioui', 'Responsable de la communication', 'Head of Communication'),
+    member('Meryem Hajji', 'Responsable des médias', 'Head of Media'),
+  ] },
+  { id: 'financial', name: { fr: 'Département financier', en: 'Financial Department' }, members: [
+    member('Asmae Ajbade', 'Responsable des partenariats', 'Head of Sponsorships'),
+    member('Yasmine Alaoui', 'Trésorière', 'Treasurer'),
+  ] },
+];
+export const boardMembers = [...boardLeaders, ...boardDepartments.flatMap(department => department.members)];

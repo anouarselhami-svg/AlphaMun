@@ -20,44 +20,38 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
- await evaluate("document.querySelector('.board-toggle').click()");await pause();
- const expectedNames=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Laila Addab','Yasmine Bentaleb','Nidal ElHammioui','Meryem Hajji','Adam Dekiouak','Asmae Ajabbade','Yasmine Alaoui'];
- const fr=['Présidente','Vice-présidente','Secrétaire général','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Communication','Head of Media','Head of Staff','Head of Sponsorships','Trésorière'];
- const en=['President','Vice-President','Secretary-General',...fr.slice(3,10),'Treasurer'];
+ const expected=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Lailla Addab','Yasmine Bentaleb','Adam Dkouik','Zineb Maftah','Lina Sbaybi','Nidal Hammioui','Meryem Hajji','Asmae Ajbade','Yasmine Alaoui'];
+ const fr=['Présidente','Vice-présidente','Secrétaire général','Responsable des affaires académiques','Responsable des comités','Responsable des comités','Responsable du staff','Responsable des affaires des délégués','Coordinatrice de l’événement','Responsable de la communication','Responsable des médias','Responsable des partenariats','Trésorière'];
+ const en=['President','Vice-President','Secretary-General','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Staff','Head of Delegate Affairs','Event Coordinator','Head of Communication','Head of Media','Head of Sponsorships','Treasurer'];
+ const key=async(k,c,n)=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key:k,code:c,windowsVirtualKeyCode:n,...(k==='Enter'?{text:'\r'}:{})});await call('Input.dispatchKeyEvent',{type:'keyUp',key:k,code:c,windowsVirtualKeyCode:n});await pause();};
  for(const width of [320,360,390,430,768,1024,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
-   assert.equal(await evaluate("document.querySelectorAll('#bureau').length"),1);
-   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.board-card h3')).map(e=>e.textContent)"),expectedNames);
-   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.board-card p')).map(e=>e.textContent)"),language==='fr'?fr:en);
-   assert.equal(await evaluate("document.querySelector('#board-title').textContent"),language==='fr'?'Notre équipe organisatrice':'Our organising team');
-   assert.equal(await evaluate("document.querySelectorAll('.board-avatar img').length"),0);
-   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.board-avatar')).map(e=>e.textContent)"),['HEK','RA','ML','MH','LA','YB','NE','MH','AD','AA','YA']);
-   assert.ok(await evaluate("Array.from(document.querySelectorAll('.board-card h3,.board-card p')).every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Clipped name or role');
-   assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'Horizontal overflow');
-   assert.equal(await evaluate("getComputedStyle(document.querySelector('.board-grid')).gridTemplateColumns.split(' ').length"),width<=1000?2:3);
-   const geometry=await evaluate(`(()=>{
-     const cards=[...document.querySelectorAll('.board-card')].map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};});
-     const grid=document.querySelector('.board-grid').getBoundingClientRect();
-     return {cards,center:(grid.left+grid.right)/2,avatars:[...document.querySelectorAll('.board-avatar')].map(e=>e.getBoundingClientRect().width),overlap:cards.some((a,i)=>cards.slice(i+1).some(b=>Math.min(a.right,b.right)>Math.max(a.left,b.left)+1&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+1))};
-   })()`);
-   assert.ok(!geometry.overlap,'Overlapping cards');
-   if(width<=540) {
-     assert.ok(geometry.avatars.every(size=>size===56),'Mobile avatar diameter');
-     for(let row=0;row<5;row++) {
-       const [a,b]=geometry.cards.slice(row*2,row*2+2);
-       assert.ok(Math.abs(a.top-b.top)<1,'Two members per row');
-       assert.ok(Math.abs(a.width-b.width)<1,'Equal card widths');
-     }
-     const last=geometry.cards[10];
-     assert.ok(Math.abs(last.width-geometry.cards[0].width)<1,'Last card width');
-     assert.ok(Math.abs((last.left+last.right)/2-geometry.center)<1,'Last member centered');
-   } else assert.ok(geometry.avatars.every(size=>size===88),'Desktop/tablet avatar preserved');
+   assert.equal(await evaluate("document.querySelectorAll('#board-title button,#board-title svg').length"),0);
+   assert.deepEqual(await evaluate("[...document.querySelectorAll('.board-card h3')].map(e=>e.textContent)"),expected);
+   assert.deepEqual(await evaluate("[...document.querySelectorAll('.board-role')].map(e=>e.textContent)"),language==='fr'?fr:en);
+   assert.equal(await evaluate("document.querySelectorAll('.board-grid:not([hidden])').length"),0);
+   assert.equal(await evaluate("document.querySelectorAll('.board-leaders .board-department-label').length"),0);
+   const leaders=await evaluate("[...document.querySelectorAll('.board-leaders .board-card')].map(e=>{const r=e.getBoundingClientRect();return {top:r.top,width:r.width};})");
+   assert.ok(leaders.every(r=>Math.abs(r.top-leaders[0].top)<1&&Math.abs(r.width-leaders[0].width)<1),'Three equal leaders on one row');
+   for(let i=0;i<4;i++) {
+    await evaluate(`document.querySelectorAll('.board-department-toggle')[${i}].focus()`);await key('Enter','Enter',13);
+    assert.equal(await evaluate("document.querySelectorAll('.board-grid:not([hidden])').length"),i+1);
+    assert.equal(await evaluate(`document.querySelectorAll('.board-department-toggle')[${i}].getAttribute('aria-expanded')`),'true');
+    assert.ok(await evaluate(`document.getElementById(document.querySelectorAll('.board-department-toggle')[${i}].getAttribute('aria-controls'))!==null`));
+   }
+   assert.equal(await evaluate("document.querySelectorAll('.board-department-label').length"),10);
+   assert.ok(await evaluate("[...document.querySelectorAll('.board-card h3,.board-card p')].every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Clipped text');
+   assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
+   const grids=await evaluate("[...document.querySelectorAll('.board-grid')].map(grid=>{const g=grid.getBoundingClientRect();return {center:(g.left+g.right)/2,cards:[...grid.children].map(e=>{const r=e.getBoundingClientRect();return {top:r.top,width:r.width,center:(r.left+r.right)/2};})};})");
+   for(const grid of grids){const [a,b,c]=grid.cards;assert.ok(Math.abs(a.top-b.top)<1&&Math.abs(a.width-b.width)<1);if(c&&width<=760){assert.ok(c.top>a.top);assert.ok(Math.abs(c.width-a.width)<1&&Math.abs(c.center-grid.center)<1);}if(c&&width>760)assert.ok(Math.abs(c.top-a.top)<1);}
+   if(language==='fr'){
+    await evaluate("window.scrollTo({top:window.scrollY+document.querySelector('#bureau').getBoundingClientRect().top-document.querySelector('header').offsetHeight-16,behavior:'instant'})");await pause();
+    const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`board-departments-${width}.png`),Buffer.from(capture.data,'base64'));
+   }
+   for(let i=0;i<4;i++){await evaluate(`document.querySelectorAll('.board-department-toggle')[${i}].focus()`);await key(' ','Space',32);assert.equal(await evaluate(`document.querySelectorAll('.board-department-toggle')[${i}].getAttribute('aria-expanded')`),'false');}
   }
-  await evaluate("document.querySelector('#bureau').scrollIntoView({behavior:'instant',block:'start'})");await pause();
-  const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(path.join(directory,`board-${width}.png`),Buffer.from(capture.data,'base64'));
-  console.log(`${width}px: 11 members in order, roles FR/EN, initials, readable responsive grid, no overflow.`);
+  console.log(`${width}px: 13 names and FR/EN roles, three leaders, independent departments, mobile two columns/centered third, desktop rows, keyboard/ARIA, no clipping/overflow.`);
  }
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}

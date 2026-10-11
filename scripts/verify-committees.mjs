@@ -52,7 +52,7 @@ try {
    assert.ok(await evaluate("Array.from(document.querySelectorAll('.committee-meta,.committee-toggle')).every(e=>e.scrollWidth<=e.clientWidth)"),'Card text overflow');
    assert.equal(await evaluate("document.querySelector('.committee-registration').getAttribute('href')"),'/#packs');
    assert.equal(await evaluate("document.querySelectorAll('#programme .programme-slots li').length"),26);
-   assert.equal(await evaluate("document.querySelectorAll('.board-card').length"),11);
+   assert.equal(await evaluate("document.querySelectorAll('.board-card').length"),13);
   }
   await evaluate("document.querySelector('.committee-filters').scrollIntoView({behavior:'instant',block:'center'})");await pause();
   const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`committees-${width}.png`),Buffer.from(capture.data,'base64'));

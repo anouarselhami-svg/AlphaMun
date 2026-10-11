@@ -21,47 +21,36 @@ try {
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
- for(const width of [320,360,390,430,640,768,1440]) {
-  await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<=640});await pause();
+ for(const width of [320,360,390,430,768,1024,1440]) {
+  await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
+   assert.equal(await evaluate("document.querySelectorAll('.programme-tabs,.programme-schedule').length"),0);
+   assert.equal(await evaluate("document.querySelectorAll('.programme-day-panel:not([hidden])').length"),0);
    assert.equal(await evaluate("document.querySelectorAll('#programme .programme-slots li').length"),26);
-   assert.equal(await evaluate("document.querySelectorAll('#programme .programme-day-panel:not([hidden])').length"),0);
-   assert.equal(await evaluate("document.querySelectorAll('.programme-card').length"),3);
-   const mobile=width<=640;
-   assert.equal(await evaluate("document.querySelectorAll('.programme-day-toggle').length"),mobile?3:0);
-   assert.equal(await evaluate("document.querySelectorAll('.programme-tabs').length"),mobile?0:1);
+   assert.equal(await evaluate("getComputedStyle(document.querySelector('.programme-grid')).gridTemplateColumns.split(' ').length"),width<=640?1:width<=1000?2:3);
+   const before=await evaluate("[...document.querySelectorAll('.programme-card')].map(e=>e.getBoundingClientRect().height)");
    for(let day=0;day<3;day++) {
-    const id=`programme-${mobile?'mobile-':''}tab-${day}`;
-    const panelId=`programme-${mobile?'mobile-':''}panel-${day}`;
-    await evaluate(`document.getElementById('${id}').click()`);await pause();
-    assert.equal(await evaluate(`document.getElementById('${id}').getAttribute('aria-expanded')`),'true');
-    assert.equal(await evaluate(`document.getElementById('${id}').getAttribute('aria-controls')`),panelId);
-    assert.ok(await evaluate(`!document.getElementById('${panelId}').hidden`));
-    assert.equal(await evaluate(`document.getElementById('${panelId}').querySelectorAll('li').length`),[9,12,5][day]);
-    assert.ok(await evaluate(`getComputedStyle(document.getElementById('${id}').querySelector('svg')).transform.includes('-1')`));
-    if(mobile) {
-     assert.ok(await evaluate(`document.getElementById('${panelId}').closest('.programme-card')===document.querySelectorAll('.programme-card')[${day}]`));
-     assert.ok(await evaluate(`(()=>{const panel=document.getElementById('${panelId}').getBoundingClientRect(),title=document.getElementById('${id}').getBoundingClientRect();const next=document.querySelectorAll('.programme-card')[${day+1}];return panel.top>=title.bottom&&(!next||panel.bottom<=next.getBoundingClientRect().top);})()`),'Panel before next photograph');
-     assert.ok(await evaluate(`(()=>{const b=document.getElementById('${id}').getBoundingClientRect(),s=document.getElementById('${id}').querySelector('svg').getBoundingClientRect();return Math.abs((b.top+b.bottom)/2-(s.top+s.bottom)/2)<2;})()`),'Chevron alignment');
-    }
+    await evaluate(`document.querySelector('#programme-tab-${day}').click()`);await pause();
+    assert.equal(await evaluate("document.querySelectorAll('.programme-day-panel:not([hidden])').length"),day+1);
+    assert.equal(await evaluate(`document.querySelector('#programme-tab-${day}').getAttribute('aria-expanded')`),'true');
+    assert.ok(await evaluate(`document.querySelector('#programme-panel-${day}').closest('.programme-card')===document.querySelectorAll('.programme-card')[${day}]`));
+    assert.equal(await evaluate(`document.querySelector('#programme-panel-${day}').querySelectorAll('li').length`),[9,12,5][day]);
+    assert.ok(await evaluate(`(()=>{const card=document.querySelectorAll('.programme-card')[${day}],photo=card.querySelector('.programme-photo').getBoundingClientRect(),venue=card.querySelector('.programme-venue').getBoundingClientRect(),button=card.querySelector('button').getBoundingClientRect(),panel=card.querySelector('.programme-day-panel').getBoundingClientRect();return photo.bottom<=venue.top&&venue.bottom<=button.top&&button.bottom<=panel.top;})()`),'Photo/venue/control/schedule order');
+    assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
+    if(day===0&&width>1000){const after=await evaluate("[...document.querySelectorAll('.programme-card')].map(e=>e.getBoundingClientRect().height)");assert.equal(after[1],before[1]);assert.equal(after[2],before[2]);assert.ok(after[0]>before[0]);}
    }
-   if(mobile) assert.equal(await evaluate("document.querySelectorAll('#programme .programme-day-panel:not([hidden])').length"),3);
-   else assert.equal(await evaluate("document.querySelectorAll('#programme .programme-day-panel:not([hidden])').length"),1);
-   if(language==='fr'&&(width===390||width===1440)) {
-    await evaluate(`document.getElementById('programme-${mobile?'mobile-':''}tab-0').scrollIntoView({behavior:'instant',block:'center'})`);await pause();
-    const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`programme-inline-${width}.png`),Buffer.from(capture.data,'base64'));
+   if(language==='fr'){
+    await evaluate("window.scrollTo({top:scrollY+document.querySelector('.programme-grid').getBoundingClientRect().top-document.querySelector('header').offsetHeight-16,behavior:'instant'})");await pause();
+    const capture=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(directory,`programme-cards-${width}.png`),Buffer.from(capture.data,'base64'));
    }
-   for(let day=0;day<3;day++) {
-    if(!mobile&&day!==2)continue;
-    const id=`programme-${mobile?'mobile-':''}tab-${day}`;
-    await evaluate(`document.getElementById('${id}').focus()`);
+   for(let day=0;day<3;day++){
+    await evaluate(`document.querySelector('#programme-tab-${day}').focus()`);
     await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r'});
     await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});await pause();
-    assert.equal(await evaluate(`document.getElementById('${id}').getAttribute('aria-expanded')`),'false');
+    assert.equal(await evaluate(`document.querySelector('#programme-tab-${day}').getAttribute('aria-expanded')`),'false');
    }
-   assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
   }
-  console.log(`${width}px: FR/EN, 26 slots, photos and day order, inline mobile panels, independent toggles, desktop layout, keyboard, ARIA, chevron alignment, no overflow.`);
+  console.log(`${width}px: shared cards, independent toggles, correct order, 26 slots, FR/EN, keyboard/ARIA, no overflow or sibling stretching.`);
  }
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}

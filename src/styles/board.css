@@ -1,15 +1,37 @@
-﻿.board-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;padding:0;margin:36px 0 0}
-.board-card {min-width:0;padding:28px 20px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--wine);text-align:center}
-.board-avatar {display:flex;align-items:center;justify-content:center;width:88px;height:88px;margin:0 auto 20px;border:2px solid var(--gold);border-radius:50%;background:var(--surface);overflow:hidden;font-family:'GFS Didot',Georgia,serif;font-size:28px}
+﻿.board-grid,.board-leaders {display:grid;list-style:none;padding:0;margin:0;min-width:0}
+.board-grid {grid-template-columns:repeat(var(--department-columns,3),minmax(0,1fr));gap:16px;align-items:start;margin-top:16px}
+.board-grid[hidden] {display:none}
+.board-card {min-width:0;padding:20px 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--wine);text-align:center}
+.board-avatar {display:flex;align-items:center;justify-content:center;width:88px;height:88px;margin:0 auto 16px;border:2px solid var(--gold);border-radius:50%;background:var(--surface);overflow:hidden;font-family:'GFS Didot',Georgia,serif;font-size:28px}
 .board-avatar img {display:block;width:100%;height:100%;object-fit:cover}
-.board-card h3 {font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;line-height:1.4;margin:0 0 10px;overflow-wrap:anywhere}
-.board-card p {font-size:.95rem;line-height:1.6;margin:0;overflow-wrap:anywhere}
-@media(max-width:1000px){.board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){
-  .board-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:24px;align-items:start}
-  .board-card {padding:14px 8px}
-  .board-avatar {width:56px;height:56px;margin-bottom:12px;font-size:20px}
-  .board-card h3 {font-size:1rem;line-height:1.35;margin-bottom:6px;overflow-wrap:normal;word-break:normal}
-  .board-card p {font-size:.8rem;line-height:1.45;overflow-wrap:normal;word-break:normal}
-  .board-card:last-child:nth-child(odd) {grid-column:1 / -1;justify-self:center;width:calc((100% - 10px) / 2)}
+.board-card h3 {font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;line-height:1.4;margin:0 0 8px;overflow-wrap:anywhere}
+.board-card p {font-size:.95rem;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.board-card .board-department-label {font-size:.75rem;line-height:1.4;margin-top:10px;color:var(--muted)}
+.board-leaders-group {margin-top:28px;padding-bottom:24px;border-bottom:1px solid var(--gold)}
+.board-leaders {grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--gold);border-radius:6px;overflow:hidden;background:var(--paper)}
+.board-leaders .board-card {border:0;border-radius:0;padding:22px 14px}
+.board-leaders .board-card + .board-card {border-left:1px solid var(--gold)}
+.board-departments {display:grid;gap:12px;margin-top:24px}
+.board-department {min-width:0;padding:14px;border:1px solid var(--gold);border-radius:6px;background:var(--paper)}
+.board-department-title {font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;line-height:1.4;margin:0}
+.board-department-toggle {display:flex;align-items:center;gap:8px;max-width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:var(--wine);font:inherit;text-align:left;cursor:pointer}
+.board-department-toggle span {min-width:0}
+.board-department-toggle .icon {width:18px;height:18px;flex-shrink:0;transition:transform .2s}
+.board-department-toggle[aria-expanded="true"] .icon {transform:rotate(180deg)}
+.board-department-toggle:focus-visible {outline:3px solid var(--wine);outline-offset:4px;border-radius:3px}
+@media(max-width:760px){
+ .board-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .board-card {padding:14px 8px}
+ .board-avatar {width:56px;height:56px;margin-bottom:12px;font-size:20px}
+ .board-card h3 {font-size:1rem;line-height:1.35;margin-bottom:6px}
+ .board-card p {font-size:.8rem;line-height:1.45}
+ .board-grid .board-card:last-child:nth-child(odd) {grid-column:1 / -1;justify-self:center;width:calc((100% - 10px) / 2)}
+ .board-department {padding:10px}
+ .board-department-title {font-size:1.15rem}
+ .board-leaders-group {margin-top:22px;padding-bottom:18px}
+ .board-leaders .board-card {padding:12px 5px}
+ .board-leaders .board-avatar {width:44px;height:44px;margin-bottom:10px;font-size:17px}
+ .board-leaders .board-card h3 {font-size:.85rem;line-height:1.35}
+ .board-leaders .board-card p {font-size:.75rem;line-height:1.4}
 }
+@media(prefers-reduced-motion:reduce){.board-department-toggle .icon{transition:none}}
