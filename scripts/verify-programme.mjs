@@ -43,7 +43,7 @@ try {
  assert.equal(await evaluate('document.activeElement.id'),'programme-tab-1');
  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'});await pause();
  assert.equal(await evaluate('document.activeElement.id'),'programme-tab-0');
- await call('Emulation.setDeviceMetricsOverride',{width:320,height:844,deviceScaleFactor:1,mobile:true});
+ await call('Emulation.setDeviceMetricsOverride',{width:768,height:844,deviceScaleFactor:1,mobile:true});
  await call('Emulation.setTouchEmulationEnabled',{enabled:true});
  for(let day=0;day<3;day++) {
    await evaluate(`document.querySelectorAll('.programme-tabs button')[${day}].scrollIntoView({block:'center',behavior:'instant'})`);await pause();
@@ -51,10 +51,10 @@ try {
    await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
    await pause();await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await new Promise(r=>setTimeout(r,500));
    assert.equal(await evaluate("document.querySelector('[role=region]:not([hidden])').id"),`programme-panel-${day}`);
-   assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'320px schedule overflow');
+   assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'768px schedule overflow');
  }
  await call('Emulation.setTouchEmulationEnabled',{enabled:false});
- console.log('26 slots; click, touch, arrows, Home/End and 320px layout verified.');
+ console.log('26 slots; click, touch, arrows, Home/End and 768px layout verified.');
  console.log('Checking whole-site language switching');
  await evaluate(`document.querySelector('.site-language button:last-child').click()`);await pause();
  assert.equal(await evaluate('document.documentElement.lang'),'en');

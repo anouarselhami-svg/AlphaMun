@@ -28,3 +28,15 @@
 .programme-time {color:var(--wine);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .programme-slots p {margin:0;overflow-wrap:anywhere;line-height:1.65}
 @media(max-width:640px){.programme-slots li{grid-template-columns:1fr;gap:6px}.programme-tabs{gap:8px}}
+.programme-day-panel[hidden] {display:none}
+@media(max-width:640px){
+  .programme-day-toggle {display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:pointer}
+  .programme-day-toggle span {min-width:0}
+  .programme-day-toggle .icon {width:18px;height:18px;flex-shrink:0;transition:transform .2s}
+  .programme-day-toggle[aria-expanded="true"] .icon {transform:rotate(180deg)}
+  .programme-day-toggle:focus-visible {outline:3px solid var(--wine);outline-offset:4px;border-radius:3px}
+  .programme-card .programme-day-panel {margin:20px 0 24px}
+  .programme-card .programme-day-panel h3 {font-size:1.1rem;line-height:1.5}
+  .programme-card .programme-slots {margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){.programme-day-toggle .icon{transition:none}}

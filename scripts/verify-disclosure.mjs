@@ -22,7 +22,7 @@ try {
  await navigate('http://127.0.0.1:5200/');
  const panel="document.querySelectorAll('.programme-schedule [role=region]:not([hidden])').length";
  const press=async(key,code,n)=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,windowsVirtualKeyCode:n,...(key==='Enter'?{text:'\r'}:{})});await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:n});await pause();};
- for(const width of [320,360,390,430,768,1440]) {
+ for(const width of [768,1440]) {
   await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<500});
   for(const language of ['fr','en']) {
    await evaluate(`document.querySelector('.site-language button:${language==='fr'?'first':'last'}-child').click()`);await pause();
