@@ -15,7 +15,7 @@ const rows = [
  ['UNESCO','fr',20,false,'Organisation des Nations unies pour l’éducation, la science et la culture','United Nations Educational, Scientific and Cultural Organization','Développe la coopération dans ces domaines et protège le patrimoine.','Develops cooperation in these fields and protects heritage.'],
  ['MPS',null,28,false,'Modélisation du Parlement marocain','Model Moroccan Parliament','Simulation pédagogique du Parlement marocain dans le cadre d’AlphaMUN ; langue de débat à compléter.','An educational simulation of the Moroccan Parliament within AlphaMUN; debate language remains to be supplied.','S(2)'],
  ['UNICEF','en',null,false,'Fonds des Nations unies pour l’enfance','United Nations Children’s Fund','Œuvre pour les droits, la protection et le bien-être des enfants dans le monde.','Works for children’s rights, protection and well-being worldwide.'],
- ['UNODC','en',null,false,'Office des Nations unies contre la drogue et le crime','United Nations Office on Drugs and Crime','Soutient la coopération internationale contre les drogues illicites, la criminalité et le terrorisme.','Supports international cooperation against illicit drugs, crime and terrorism.'],
+ ['UNODC','fr',null,false,'Office des Nations unies contre la drogue et le crime','United Nations Office on Drugs and Crime','Soutient la coopération internationale contre les drogues illicites, la criminalité et le terrorisme.','Supports international cooperation against illicit drugs, crime and terrorism.'],
 ];
 
 export const committees = rows.map(([acronym,debateLanguage,capacity,crisis,nameFr,nameEn,definitionFr,definitionEn,annotation]) => ({
