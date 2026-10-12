@@ -42,10 +42,9 @@ function DayCard({day,index,english}) {
       {failed?<div className="programme-placeholder" role="img" aria-label={english?`Photograph of ${day.venue} coming soon`:`Photographie de ${day.venue} à venir`}><span aria-hidden="true">◎</span><p>{day.name}</p><small>{english?'Photograph coming soon':'Photographie à venir'}</small></div>:<img src={day.image} alt={english?`View of ${day.venue}`:`Vue de ${day.venue}`} width={day.width} height={day.height} loading="lazy" decoding="async" style={{objectPosition:day.position}} onError={()=>setFailed(true)}/>}
     </div>
     <div className="programme-card-copy"><div className="programme-presentation"><div className="programme-presentation-content"><p className="eyebrow">{english?'DAY':'JOUR'} {index+1}</p>
-      <h3>{english?'Day':'Jour'} {index+1} — {day.name}</h3>
+      <h3><button className="programme-day-toggle" type="button" id={`programme-tab-${index}`} aria-controls={`programme-panel-${index}`} aria-expanded={open} onClick={() => setOpen(current => !current)}><span>{english?'Day':'Jour'} {index+1} — {day.name.slice(0,day.name.lastIndexOf(' ')+1)}<span className="programme-title-ending"><span className="programme-title-last-word">{day.name.split(' ').at(-1)}</span><ArrowDown /></span></span></button></h3>
       <p className="programme-venue">{english?'Venue':'Lieu'} : {day.venue}</p><p className="programme-description">{english?day.en:day.fr}</p>
       </div>
-      <button className="programme-day-toggle" type="button" id={`programme-tab-${index}`} aria-controls={`programme-panel-${index}`} aria-expanded={open} onClick={() => setOpen(current => !current)}><span>{english?'Day':'Jour'} {index+1}</span><ArrowDown /></button>
       </div>
       <Schedule index={index} open={open} />
     </div>
@@ -60,10 +59,9 @@ export default function Programme() {
   useEffect(() => {
     const grid = gridRef.current;
     const contents = [...grid.querySelectorAll('.programme-presentation-content')];
-    const buttons = [...grid.querySelectorAll('.programme-day-toggle')];
-    const measure = () => setPresentationHeight(Math.ceil(Math.max(...contents.map((content, index) => content.getBoundingClientRect().height + buttons[index].getBoundingClientRect().height + 18))));
+    const measure = () => setPresentationHeight(Math.ceil(Math.max(...contents.map(content => content.getBoundingClientRect().height))));
     const observer = new ResizeObserver(measure);
-    [...contents, ...buttons].forEach(element => observer.observe(element));
+    contents.forEach(element => observer.observe(element));
     measure();
     return () => observer.disconnect();
   }, [language]);

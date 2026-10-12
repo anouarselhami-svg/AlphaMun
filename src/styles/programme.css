@@ -23,9 +23,9 @@
 .programme-slots p {margin:0;overflow-wrap:anywhere;line-height:1.65}
 
 .programme-day-panel[hidden] {display:none}
-.programme-day-toggle {display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:18px 0 0;padding:10px 12px;border:1px solid var(--gold);border-radius:4px;background:var(--paper);color:var(--wine);font:inherit;line-height:1.5;text-align:left;cursor:pointer}
+.programme-day-toggle {display:block;width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:pointer}
 .programme-day-toggle span {min-width:0}
-.programme-day-toggle .icon {width:18px;height:18px;flex-shrink:0;transition:transform .2s}
+.programme-day-toggle .icon {display:inline-block;width:18px;height:18px;margin-left:8px;vertical-align:middle;transition:transform .2s}
 .programme-day-toggle[aria-expanded="true"] .icon {transform:rotate(180deg)}
 .programme-day-toggle:focus-visible {outline:3px solid var(--wine);outline-offset:4px}
 .programme-card .programme-day-panel {margin-top:20px}
@@ -38,6 +38,6 @@
 /* Equal closed presentations; schedule panels stay outside this shared height. */
 .programme-presentation-content {display:flow-root}
 @media(min-width:1001px){
-  .programme-presentation {display:flex;flex-direction:column;gap:18px;min-height:var(--programme-presentation-height,0px)}
-  .programme-presentation .programme-day-toggle {margin-top:auto;flex-shrink:0}
+  .programme-presentation {display:flex;flex-direction:column;min-height:var(--programme-presentation-height,0px)}
 }
+.programme-title-ending {display:inline-block;white-space:nowrap}
