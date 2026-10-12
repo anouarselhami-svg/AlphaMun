@@ -40,6 +40,20 @@ try {
  await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
  const set=async(name,value)=>{await evaluate(`(()=>{const e=document.querySelector('[name="${name}"]');const setter=Object.getOwnPropertyDescriptor(e.tagName==='SELECT'?HTMLSelectElement.prototype:e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype,'value').set;setter.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));})()`);await pause();};
  const click=async text=>{assert.ok(await evaluate(`(()=>{const button=Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()===${JSON.stringify(text)});button?.click();return !!button;})()`),text);await pause();};
+ console.log('Checking contact storage acknowledgment, failure and retry');
+ await set('nom','TEST_CONTACT_BROWSER');await set('email','contact-browser@example.com');await set('message','TEST_FICTIF contact request');
+ await evaluate(`window.__contactIds=[];window.__contactCalls=0;window.fetch=(url,options)=>{if(url!=='/api/contact')throw Error('Unexpected endpoint');window.__contactCalls++;window.__contactIds.push(options.body.get('submission_id'));return new Promise(resolve=>window.__contactFinish=()=>resolve(new Response(JSON.stringify({ok:false}),{headers:{'Content-Type':'application/json'}})));}`);
+ await click('Envoyer mon message');
+ assert.ok(await evaluate("document.querySelector('#contact-form button').disabled"));
+ await evaluate("document.querySelector('#contact-form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))");
+ assert.equal(await evaluate('window.__contactCalls'),1);
+ await evaluate('window.__contactFinish()');await pause();
+ assert.ok(await evaluate("document.querySelector('#contact-status').textContent.includes('conservées')"));
+ assert.equal(await evaluate("document.querySelector('#contact-form [name=message]').value"),'TEST_FICTIF contact request');
+ await evaluate(`window.fetch=async(url,options)=>{window.__contactIds.push(options.body.get('submission_id'));return Response.json({ok:true,stored:true,submissionId:options.body.get('submission_id')});}`);
+ await click('Envoyer mon message');
+ assert.ok(await evaluate("document.querySelector('#contact-status').textContent.includes('enregistrée')"));
+ assert.ok(await evaluate('window.__contactIds.length===2&&window.__contactIds[0]===window.__contactIds[1]'));
  console.log('Checking pack entry URLs');
  for(const pack of ['500','1500']){await navigate(`http://127.0.0.1:5201/?pack=${pack}`);assert.match(await evaluate(`document.querySelector('.selected-pack').textContent`),pack==='500'?/500 MAD/:/1 500 MAD/);assert.equal(await evaluate(`document.querySelectorAll('.registration-progress li').length`),5);await call('Page.reload');await pause();await pause();assert.match(await evaluate(`document.querySelector('.selected-pack').textContent`),pack==='500'?/500 MAD/:/1 500 MAD/);}
  await navigate('http://127.0.0.1:5201/?pack=1550');assert.ok(await evaluate(`!!document.querySelector('.selected-pack select')`));
@@ -57,7 +71,7 @@ try {
  assert.ok(await evaluate(`!!document.querySelector('[name="experience_details"]')`));
  await click('Suivant');assert.equal(await evaluate('document.activeElement.name'),'experience_details');
  await set('experience_details','No previous experience');await set('motivation','Discover my first-choice committee');await set('attentes','Learn diplomacy');await click('Suivant');
- await set('pack','1500');assert.ok(await evaluate(`document.querySelector('.selected-pack').textContent.includes('1 500 MAD')`));await set('logistique','None');await click('Suivant');
+ await set('pack','1500');assert.ok(await evaluate(`document.querySelector('.selected-pack').textContent.includes('1 500 MAD')`));await set('logistique','None');await set('hebergement','oui');await set('restrictions_alimentaires','TEST no nuts');await set('besoins_particuliers','TEST access request');await click('Suivant');
  assert.equal(await evaluate(`document.querySelectorAll('.checkbox input').length`),4);
  assert.ok(await evaluate(`Array.from(document.querySelectorAll('.checkbox input')).every(e=>!e.checked)`));
  assert.ok(await evaluate(`!document.querySelector('main').textContent.includes('Merci pour votre inscription !')`));
@@ -68,11 +82,12 @@ try {
  assert.ok(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),'mobile horizontal overflow');assert.equal(await evaluate(`getComputedStyle(document.querySelector('.registration-fields')).gridTemplateColumns.split(' ').length`),1);
  const screenshot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});await writeFile(path.join(directory,'registration-mobile.png'),Buffer.from(screenshot.data,'base64'));
  // Intercept all submissions in the browser: never contact Apps Script or production Sheets.
- await evaluate(`window.__calls=0;window.fetch=()=>{window.__calls++;return new Promise(resolve=>window.__finish=()=>resolve(new Response(JSON.stringify({ok:false}),{headers:{'Content-Type':'application/json'}})));}`);
+ await evaluate(`window.__calls=0;window.__submissionIds=[];window.fetch=(url,options)=>{window.__calls++;window.__submissionIds.push(options.body.get('submission_id'));if(options.body.get('hebergement')!=='oui'||options.body.get('restrictions_alimentaires')!=='TEST no nuts')throw Error('Optional fields missing');return new Promise(resolve=>window.__finish=()=>resolve(new Response(JSON.stringify({ok:false}),{headers:{'Content-Type':'application/json'}})));}`);
  console.log('Checking submission');
- await click('Envoyer mon inscription');assert.ok(await evaluate(`document.querySelector('button[type="submit"]').disabled`));assert.equal(await evaluate('window.__calls'),1);await evaluate('window.__finish()');await pause();assert.ok(await evaluate(`document.querySelector('[role="status"]').textContent.includes('conservées')`));assert.ok(await evaluate(`!document.querySelector('fieldset').disabled`));
+ await click('Envoyer mon inscription');assert.ok(await evaluate(`document.querySelector('button[type="submit"]').disabled`));await evaluate("document.querySelector('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))");assert.equal(await evaluate('window.__calls'),1);await evaluate('window.__finish()');await pause();assert.ok(await evaluate(`document.querySelector('[role="status"]').textContent.includes('conservées')`));assert.ok(await evaluate(`!document.querySelector('fieldset').disabled`));
  await click('Précédent');assert.equal(await evaluate(`document.querySelector('[name="logistique"]').value`),'None');await click('Suivant');
- await evaluate(`window.fetch=async()=>new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json'}})`);await click('Envoyer mon inscription');assert.ok(await evaluate(`document.querySelector('main').textContent.includes('Votre demande a bien été enregistrée')`));
+ await evaluate(`window.fetch=async(url,options)=>{window.__submissionIds.push(options.body.get('submission_id'));return new Response(JSON.stringify({ok:true,stored:true,submissionId:options.body.get('submission_id')}),{headers:{'Content-Type':'application/json'}})}`);await click('Envoyer mon inscription');assert.ok(await evaluate(`document.querySelector('main').textContent.includes('Votre demande a bien été enregistrée')`));
  await click('EN');assert.ok(await evaluate(`document.querySelector('main').textContent.includes('Thank you for registering! Your submission has been successfully received.')`));
+ assert.ok(await evaluate('window.__submissionIds.length===2&&window.__submissionIds[0]===window.__submissionIds[1]'));
  console.log('Browser checks passed: both external pack links, direct visits/reloads, invalid pack, steps, retained answers, minor guardian, package change, mobile layout, pending state, failure/retry, mocked success. No production submission.');
 } finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));await new Promise(r=>registration.httpServer.close(r));}
