@@ -24,4 +24,4 @@ npm --prefix backend run test:runtime
 
 Sous PowerShell avec scripts désactivés, utiliser npm.cmd. Wrangler et Edge ont été exécutés avec l’autorisation nécessaire au runtime local ; aucune modification de la politique PowerShell.
 
-La livraison réelle reste à vérifier après configuration distante de Resend/Cloudflare et autorisation de publication. Aucun changement DNS, secret Cloudflare distant, déploiement public ou accès au tableur historique. L’expéditeur indiqué par l’utilisateur est alphamun@youthglobalclub.com ; le statut Verified du compte Resend n’a pas été inspecté.
+La livraison réelle reste à vérifier après configuration distante de Resend/Cloudflare et autorisation de publication. Aucun changement DNS, secret Cloudflare distant, déploiement public ou accès au tableur historique. L’expéditeur est alphamun@youthglobalclub.com ; l’utilisateur confirme que youthglobalclub.com est vérifié dans Resend. Les deux configurations Pages définissent l’expéditeur et le destinataire ; la clé est lue uniquement depuis l’environnement serveur.

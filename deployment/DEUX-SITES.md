@@ -11,10 +11,10 @@ La racine du site d’inscription doit être frontend/registration-site pour que
 
 ## Resend et variables serveur
 
-1. Dans Resend, vérifier youthglobalclub.com : ajouter les enregistrements DNS demandés et attendre le statut Verified. Conserver les MX de la messagerie destinataire ; ne pas remplacer la configuration de réception du courrier.
+1. Le domaine youthglobalclub.com est vérifié dans Resend, selon la confirmation de l’utilisateur. Conserver les enregistrements DNS et MX existants.
 2. L’expéditeur choisi est alphamun@youthglobalclub.com. Le destinataire est également alphamun@youthglobalclub.com. Le participant apparaît en Reply-To. La vérification réelle du compte Resend n’a pas été consultée pendant cette préparation.
 3. Dans Cloudflare → Workers & Pages → alphamun-inscription → Settings → Variables and Secrets, définir RESEND_API_KEY en tant que SECRET chiffré. Utiliser la clé serveur fournie, sans la copier dans Git, les variables VITE ou le navigateur.
-4. Définir REGISTRATION_EMAIL_FROM=alphamun@youthglobalclub.com côté serveur. REGISTRATION_EMAIL_TO=alphamun@youthglobalclub.com est déjà dans wrangler.toml. Configurer production et preview selon les environnements réellement utilisés ; une preview avec ces valeurs enverra des emails réels.
+4. REGISTRATION_EMAIL_FROM et REGISTRATION_EMAIL_TO sont déjà configurés à alphamun@youthglobalclub.com dans les deux wrangler.toml. Configurer le secret RESEND_API_KEY pour production et preview selon les environnements réellement utilisés ; une preview avec une clé réelle enverra des emails réels.
 5. Pour conserver le formulaire de contact du site principal, configurer les mêmes trois paramètres dans alpha-mun-main. Chaque projet Pages a son environnement indépendant. En local, utiliser son propre fichier .dev.vars, ignoré par Git.
 6. Retirer les anciens secrets et variables Apps Script/Sheets du tableau de bord lors de la future mise en service. Ne pas supprimer le tableur ni les anciennes inscriptions. VITE_API_BASE_URL n’est plus utilisé ; retirer sa configuration de build historique.
 
