@@ -1,0 +1,17 @@
+2026-10-13 20:24:57.673: [INFO] CurrentProfilePath: C:\Users\Anouar Selhami\Desktop\Alpha_MUN\.pdf-reader\edge\Default
+2026-10-13 20:24:57.673: [INFO] Profiles total count: 1
+2026-10-13 20:24:57.673: [INFO] Profile: name=Profile 1 path=C:\Users\Anouar Selhami\Desktop\Alpha_MUN\.pdf-reader\edge\Default lastActive=null
+2026-10-13 20:24:57.673: [INFO] LastUsedProfileDir: C:\Users\Anouar Selhami\Desktop\Alpha_MUN\.pdf-reader\edge\Default
+2026-10-13 20:24:57.673: [INFO] VisibilityChanged: 0
+2026-10-13 20:24:57.715: [INFO] OnDoneLoading sync enabled: 0
+2026-10-13 20:24:57.715: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-10-13 20:24:57.715: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-10-13 20:24:57.715: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-13 20:24:57.782: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-10-13 20:25:01.814: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-10-13 20:25:01.821: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-10-13 20:25:01.828: [INFO] Primary account changed.
+2026-10-13 20:25:01.828: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-10-13 20:25:01.842: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-10-13 20:25:01.898: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-10-13 20:25:07.694: [INFO] Sync initialization duration: 5608ms

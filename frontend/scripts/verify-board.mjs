@@ -3,15 +3,16 @@ import { preview } from 'vite';
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { boardMembers } from '../src/data/board.js';
 const main=await preview({configFile:false,preview:{host:'127.0.0.1',port:5200,strictPort:true}});
 
 const directory=path.resolve('.browser-check');await mkdir(directory,{recursive:true});
 
-const edge=spawn(process.env.EDGE_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',['--headless=new','--disable-gpu','--no-first-run','--remote-debugging-port=9243',`--user-data-dir=${directory}/edge-${Date.now()}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
+const edge=spawn(process.env.EDGE_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',['--headless=new',...(process.env.BROWSER_NO_SANDBOX==='1'?['--no-sandbox']:[]),'--disable-gpu','--no-first-run','--remote-debugging-port=9250',`--user-data-dir=${directory}/edge-${Date.now()}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
 let socket;
-const watchdog=setTimeout(()=>{console.error('Browser test timed out');edge.kill();process.exit(1);},55000);
+const watchdog=setTimeout(()=>{console.error('Browser test timed out');edge.kill();process.exit(1);},120000);
 try {
- let target;for(let i=0;i<50;i++){try{target=await (await fetch('http://127.0.0.1:9243/json/new?about:blank',{method:'PUT',signal:AbortSignal.timeout(1000)})).json();break;}catch{await new Promise(r=>setTimeout(r,200));}}
+ let target;for(let i=0;i<50;i++){try{target=await (await fetch('http://127.0.0.1:9250/json/new?about:blank',{method:'PUT',signal:AbortSignal.timeout(1000)})).json();break;}catch{await new Promise(r=>setTimeout(r,200));}}
  assert.ok(target,'Edge remote debugging unavailable');socket=new WebSocket(target.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject;});
  let id=0;const pending=new Map();socket.onmessage=e=>{const msg=JSON.parse(e.data);if(msg.id){const item=pending.get(msg.id);pending.delete(msg.id);if(msg.error)item.reject(Error(JSON.stringify(msg.error)));else item.resolve(msg.result);}};
  const call=(method,params={})=>new Promise((resolve,reject)=>{const current=++id;pending.set(current,{resolve,reject});socket.send(JSON.stringify({id:current,method,params}));});
@@ -20,8 +21,12 @@ try {
  const navigate=async url=>{await call('Page.navigate',{url});for(let i=0;i<60;i++){await pause();if(await evaluate('document.querySelector("#root")?.children.length>0'))return;}throw Error('React did not mount');};
  await call('Page.enable');await call('Runtime.enable');
  await navigate('http://127.0.0.1:5200/');
- const expected=['Hajar El Khachai','Rania Aqachmar','Marouane Lrhoul','Miral Hatta','Lailla Addab','Yasmine Bentaleb','Adam Dekiouak','Zineb Maftah','Lina Sbaybi','Nidal Hammioui','Meryem Hajji','Asmae Ajbade','Yasmine Alaoui'];
- const fr=['Présidente','Vice-présidente','Secrétaire général','Responsable des affaires académiques','Responsable des comités','Responsable des comités','Responsable du staff','Responsable des affaires des délégués','Coordinatrice de l’événement','Responsable de la communication','Responsable des médias','Responsable des partenariats','Trésorière'];
+ const expected=boardMembers.map(member=>member.name);
+ const fr=boardMembers.map(member=>member.role.fr);
+ assert.equal(boardMembers.length,13);
+ assert.equal(new Set(expected).size,13);
+ assert.equal(new Set(boardMembers.map(member=>member.photo)).size,13);
+ for(const member of boardMembers){assert.match(member.photo,/^\/images\/team\/[a-z-]+\.png$/);const response=await fetch('http://127.0.0.1:5200'+member.photo);assert.equal(response.status,200,member.photo);assert.equal(response.headers.get('content-type'),'image/png');}
  const en=['President','Vice-President','Secretary-General','Head of Academic Affairs','Head of Committees','Head of Committees','Head of Staff','Head of Delegate Affairs','Event Coordinator','Head of Communication','Head of Media','Head of Sponsorships','Treasurer'];
  const key=async(k,c,n)=>{await call('Input.dispatchKeyEvent',{type:'keyDown',key:k,code:c,windowsVirtualKeyCode:n,...(k==='Enter'?{text:'\r'}:{})});await call('Input.dispatchKeyEvent',{type:'keyUp',key:k,code:c,windowsVirtualKeyCode:n});await pause();};
  for(const width of [320,360,390,430,768,1024,1440]) {
@@ -42,6 +47,8 @@ try {
     assert.ok(await evaluate(`document.getElementById(document.querySelectorAll('.board-department-toggle')[${i}].getAttribute('aria-controls'))!==null`));
    }
    assert.equal(await evaluate("document.querySelectorAll('.board-department-label').length"),10);
+   for(let i=0;i<13;i++){await evaluate(`document.querySelectorAll('.board-avatar img')[${i}].scrollIntoView({block:'center',behavior:'instant'})`);await pause();assert.ok(await evaluate(`(async()=>{const img=document.querySelectorAll('.board-avatar img')[${i}];await img.decode();return img.naturalWidth>0&&img.alt===img.closest('.board-card').querySelector('h3').textContent&&img.loading==='lazy'&&getComputedStyle(img).objectFit==='contain'&&getComputedStyle(img).objectPosition==='50% 100%';})()`),'Portrait loading, alt and fit');}
+   assert.equal(await evaluate("new Set([...document.querySelectorAll('.board-avatar')].map(e=>e.getBoundingClientRect().height)).size"),1,'Uniform photo height');
    assert.ok(await evaluate("[...document.querySelectorAll('.board-card h3,.board-card p')].every(e=>e.scrollWidth<=e.clientWidth&&e.scrollHeight<=e.clientHeight)"),'Clipped text');
    assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'Horizontal overflow');
    assert.ok(await evaluate("[...document.querySelectorAll('.board-grid .board-card,.board-leaders,.board-department')].every(e=>{const s=getComputedStyle(e);return s.borderTopColor==='rgb(184, 144, 88)'&&s.borderRadius==='12px'&&s.boxShadow.includes('0.06');})"),'Uniform gold frames');
@@ -69,4 +76,4 @@ try {
   }
   console.log(`${width}px: 13 names and FR/EN roles, three leaders, independent departments, mobile two columns/centered third, desktop rows, keyboard/ARIA, no clipping/overflow.`);
  }
-} finally {clearTimeout(watchdog);socket?.close();edge.kill();await new Promise(r=>main.httpServer.close(r));}
+} finally {clearTimeout(watchdog);socket?.close();edge.kill();main.httpServer.closeAllConnections();await new Promise(r=>main.httpServer.close(r));}

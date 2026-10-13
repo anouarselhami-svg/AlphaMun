@@ -7,9 +7,9 @@ function MemberCard({ member, language, department }) {
   const [failedPhoto, setFailedPhoto] = useState(null);
   const initials = member.name.split(/\s+/).map(part => part[0]).join('');
   return <li className="board-card">
-    <div className="board-avatar" aria-hidden="true">
+    <div className="board-avatar">
       {member.photo && failedPhoto !== member.photo
-        ? <img src={member.photo} alt="" width="88" height="88" loading="lazy" onError={() => setFailedPhoto(member.photo)} />
+        ? <img src={member.photo} alt={member.name} width="160" height="180" loading="lazy" onError={() => setFailedPhoto(member.photo)} />
         : <span>{initials}</span>}
     </div>
     <h3>{member.name}</h3>

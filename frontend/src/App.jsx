@@ -7,10 +7,10 @@ import Story from './components/Story';
 import Committees from './components/Committees';
 import Packs from './components/Packs';
 import Sponsors from './components/Sponsors';
+import Partners from './components/Partners';
 import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 export default function App() {
-  return <LanguageProvider><Header /><main><Hero /><Countdown /><Story /><Committees /><Packs /><EventDetails /><Sponsors /><FAQ /><Contact /></main><Footer /></LanguageProvider>;
+  return <LanguageProvider><Header /><main><Hero /><Countdown /><Story /><Committees /><Packs /><EventDetails /><Sponsors /><Partners /><FAQ /><Contact /></main><Footer /></LanguageProvider>;
 }
-

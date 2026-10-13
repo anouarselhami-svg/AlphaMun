@@ -2,8 +2,8 @@
 .board-grid {grid-template-columns:repeat(var(--department-columns,3),minmax(0,1fr));gap:16px;align-items:start;margin-top:16px}
 .board-grid[hidden] {display:none}
 .board-card {min-width:0;padding:20px 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--wine);text-align:center}
-.board-avatar {display:flex;align-items:center;justify-content:center;width:88px;height:88px;margin:0 auto 16px;border:2px solid var(--gold);border-radius:50%;background:var(--surface);overflow:hidden;font-family:'GFS Didot',Georgia,serif;font-size:28px}
-.board-avatar img {display:block;width:100%;height:100%;object-fit:cover}
+.board-avatar {display:flex;align-items:flex-end;justify-content:center;width:100%;height:180px;margin:0 auto 16px;border:2px solid var(--gold);border-radius:6px;background:var(--surface);overflow:hidden;font-family:'GFS Didot',Georgia,serif;font-size:28px}
+.board-avatar img {display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 .board-card h3 {font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;line-height:1.4;margin:0 0 8px;overflow-wrap:anywhere}
 .board-card p {font-size:.95rem;line-height:1.5;margin:0;overflow-wrap:anywhere}
 .board-card .board-department-label {font-size:.75rem;line-height:1.4;margin-top:10px;color:var(--muted)}
@@ -22,7 +22,7 @@
 @media(max-width:760px){
  .board-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
  .board-card {padding:14px 8px}
- .board-avatar {width:56px;height:56px;margin-bottom:12px;font-size:20px}
+ .board-avatar {width:100%;height:120px;margin-bottom:12px;font-size:20px}
  .board-card h3 {font-size:1rem;line-height:1.35;margin-bottom:6px}
  .board-card p {font-size:.8rem;line-height:1.45}
  .board-grid .board-card:last-child:nth-child(odd) {grid-column:1 / -1;justify-self:center;width:calc((100% - 10px) / 2)}
@@ -30,7 +30,7 @@
  .board-department-title {font-size:1.15rem}
  .board-leaders-group {margin-top:22px;padding-bottom:18px}
  .board-leaders .board-card {padding:12px 5px}
- .board-leaders .board-avatar {width:44px;height:44px;margin-bottom:10px;font-size:17px}
+ .board-leaders .board-avatar {width:100%;height:120px;margin-bottom:10px;font-size:17px}
  .board-leaders .board-card h3 {font-size:.85rem;line-height:1.35}
  .board-leaders .board-card p {font-size:.75rem;line-height:1.4}
 }

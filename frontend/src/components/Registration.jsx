@@ -4,6 +4,7 @@ import { registrationCommittees, registrationFields, registrationOptionalFields 
 import { submitRegistration, submissionAttempt } from '../services/registration';
 
 const confirmations = ['confirmation_pack','consentement','code_conduite','exactitude'];
+import {debateLanguages, packages, packageLabel} from '../../../shared/edition.js';
 export default function Registration({pack,onChoosePack}) {
   const [language,setLanguage] = useState(() => localStorage.getItem('amun-language') || 'fr');
   const t = (fr,en) => language === 'en' ? en : fr;
@@ -35,8 +36,8 @@ export default function Registration({pack,onChoosePack}) {
     etablissement: t('Nom de votre établissement', 'Name of your institution'),
     niveau: t('Ex: 1er bac, 2e bac', 'E.g. first or second year of baccalaureate'),
   };
-  const languageName = value => ({en:t('Anglais','English'),fr:t('Français','French'),ary:t('Dialecte marocain','Moroccan dialect')})[value];
-  const packName = value => value==='500'?t('Pack Normal — 500 MAD','Normal Package — 500 MAD'):value==='1500'?t('Pack Premium — 1 500 MAD','Premium Package — 1 500 MAD'):t('Choisissez votre pack','Choose your package');
+  const languageName = value => debateLanguages[value]?.[language];
+  const packName = value => packages[value]?packageLabel(value,language):t('Choisissez votre pack','Choose your package');
   function update(name,value) {
     setData(previous=>({...previous,[name]:value,...(name==='pack'?{confirmation_pack:false}:{})}));
     setErrors(previous=>({...previous,[name]:''}));

@@ -29,7 +29,7 @@ test('complete readable email with optional answers, confirmations, prices, lang
   for(const field of registrationFields) assert.ok(message.text.includes(fieldLabels[field]+' : '),field);
   for(const field of ['prenom','nom','age','email','telephone','contact_parent','ville','etablissement','niveau','comite_choix_1','comite_choix_2','comite_choix_3','participations_mun','experience_details','motivation','attentes','logistique','restrictions_alimentaires','besoins_particuliers']) assert.ok(message.text.includes(fieldLabels[field]+' : '+data[field]),field);
   assert.ok(message.text.includes('Besoin d’hébergement : Oui')); assert.ok(message.text.includes('Code de conduite accepté : Oui'));
-  assert.ok(message.text.includes('Tarif : '+pack+' MAD')); assert.ok(message.text.includes('Langue du choix 3 : Dialecte marocain'));assert.equal(message.reply_to,data.email);assert.deepEqual(message.to,['alphamun@youthglobalclub.com']);
+  assert.ok(message.text.includes('Tarif : '+pack+' DH'));assert.ok(message.text.includes('Langue du choix 3 : Arabe'));assert.equal(message.reply_to,data.email);assert.deepEqual(message.to,['alphamun@youthglobalclub.com']);
  }
  const optional={...data,langue_comite:'fr',comite:'UE',motivation_comite:'alternate',experience:'workshops',reglement:'on'};
  const message=emailPayload('registration',optional,env);for(const field of ['motivation_comite','comite','experience'])assert.ok(message.text.includes(fieldLabels[field]+' : '+optional[field]));assert.ok(message.text.includes('Langue de comité souhaitée : Français'));assert.ok(message.text.includes('Règlement accepté : Oui'));

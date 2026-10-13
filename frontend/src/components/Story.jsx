@@ -1,12 +1,6 @@
-import { useLanguage } from '../i18n/LanguageContext';
-function Story() {
-  const { t, language } = useLanguage();
-  return <section id="histoire" className="story section"><div><p className="eyebrow">{t("01 / L’ESPRIT ALPHA MUN")}</p><h2>{t("Un monde à comprendre.")}<br />{t("Une voix à")} <em>{t("construire.")}</em></h2></div><div className="story-text"><p>{t("Un Model United Nations est une simulation des Nations Unies. Vous représentez un pays, défendez ses positions et négociez des réponses aux grandes questions de notre monde.")}</p><p>{t("Organisé sous l’égide du Groupe Pédagogique Alpha à Kénitra, Alpha MUN est le projet phare du YouthGlobalClub. Sept éditions, des bureaux engagés et une même ambition : donner à la jeunesse les moyens de prendre la parole.")}</p><div className="tags"><span>{t("Prise de parole")}</span><span>{t("Négociation")}</span><span>Leadership</span></div></div>
-  <div className="stats"><div><b>7</b><span>{t("ans d’impact")}</span></div>
-  <div><b>8</b><span>{t("présidents engagés")}</span></div>
-  <div><b>7</b><span>{t("bureaux dévoués")}</span></div>
-  <div><b>1 700+</b><span>{t("délégués formés")}</span></div></div></section>;
+import {useLanguage} from '../i18n/LanguageContext';
+export default function Story(){
+ const {t,language}=useLanguage();const en=language==='en';
+ const goals=en?['Academic excellence','Cultural exchange','Civic engagement','Leadership','National and regional reach','An immersive organisation','A lasting project']:['Excellence académique','Échanges culturels','Engagement citoyen','Leadership','Rayonnement national et régional','Organisation immersive','Pérennité du projet'];
+ return <section id="histoire" className="story section"><div><p className="eyebrow">{en?'01 / THE ALPHAMUN SPIRIT':'01 / L’ESPRIT ALPHAMUN'}</p><h2>{t('Un monde à comprendre.')}<br/>{t('Une voix à')} <em>{t('construire.')}</em></h2></div><div className="story-text"><p>{en?'AlphaMUN, 8th edition, is a Model United Nations simulation organised under the Groupe Pédagogique Alpha in Kénitra. Delegates debate, negotiate and draft resolutions.':'AlphaMUN, 8e édition, est une simulation des Nations Unies organisée sous l’égide du Groupe Pédagogique Alpha, à Kénitra. Les délégués débattent, négocient et rédigent des résolutions.'}</p><p>{en?'The project aims to bring together 270 participants.':'Le projet vise à réunir 270 participants.'}</p><div className="tags">{goals.map(goal=><span key={goal}>{goal}</span>)}</div></div><div className="stats">{[[270,en?'participant target':'objectif de participants'],[13,en?'committees':'comités'],[3,en?'debate languages':'langues de débat'],[8,en?'edition':'édition']].map(([number,label])=><div key={label}><b>{number}</b><span>{label}</span></div>)}</div></section>;
 }
-export {
-  Story as default
-};

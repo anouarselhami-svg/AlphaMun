@@ -1,52 +1,23 @@
-// Debate language is independent from the site's display language.
-// Supply logo URLs only after checking the acronym in the actual image.
-const rows = [
- ['INTERPOL','en',20,true,'Organisation internationale de police criminelle','International Criminal Police Organization','Facilite la coopération entre les polices pour lutter contre la criminalité internationale.','Facilitates cooperation between police forces to combat international crime.','S(1)'],
- ['INTERSS','en',20,true,'International Relations and Security Studies','International Relations and Security Studies','Comité personnalisé d’AlphaMUN consacré aux relations internationales et aux études de sécurité ; son cadre précis reste à compléter par l’organisation.','A custom AlphaMUN committee on international relations and security studies; its detailed framework remains to be supplied by the organisers.'],
- ['UN WOMEN','en',25,false,'ONU Femmes','UN Women','Œuvre pour l’égalité entre les femmes et les hommes, les droits des femmes et leur autonomisation.','Works for gender equality, women’s rights and their empowerment.','S(2)'],
- ['AU PSC','en',20,false,'Conseil de paix et de sécurité de l’Union africaine','African Union Peace and Security Council','Consacré à la prévention et à la résolution des conflits en Afrique.','Dedicated to preventing and resolving conflicts in Africa.'],
- ['ICJ','en',20,false,'Cour internationale de Justice','International Court of Justice','Règle les différends juridiques entre États et rend des avis consultatifs.','Settles legal disputes between States and gives advisory opinions.'],
- ['UNOOSA','en',25,false,'Bureau des affaires spatiales des Nations unies','United Nations Office for Outer Space Affairs','Favorise la coopération et les utilisations pacifiques de l’espace.','Promotes cooperation and the peaceful uses of outer space.'],
- ['UE','fr',25,false,'Union européenne','European Union','Union politique et économique favorisant la coopération entre ses États membres.','A political and economic union promoting cooperation between its Member States.'],
- ['CSNU','fr',20,true,'Conseil de sécurité des Nations unies','United Nations Security Council','Organe chargé du maintien de la paix et de la sécurité internationales.','The body responsible for maintaining international peace and security.'],
- ['CIGIA','fr',25,false,'Conseil international de gouvernance de l’intelligence artificielle','International Council for Artificial Intelligence Governance','Comité personnalisé d’AlphaMUN sur la gouvernance de l’intelligence artificielle ; il ne représente pas un organisme officiel existant.','A custom AlphaMUN committee on artificial intelligence governance; it does not represent an existing official organisation.'],
- ['OMS','fr',25,true,'Organisation mondiale de la Santé','World Health Organization','Coordonne la coopération internationale en santé et la réponse aux urgences sanitaires.','Coordinates international health cooperation and the response to health emergencies.'],
- ['ECOSOC','fr',20,false,'Conseil économique et social des Nations unies','United Nations Economic and Social Council','Coordonne les travaux sur les questions économiques, sociales et le développement durable.','Coordinates work on economic and social issues and sustainable development.'],
- ['UNESCO','fr',20,false,'Organisation des Nations unies pour l’éducation, la science et la culture','United Nations Educational, Scientific and Cultural Organization','Développe la coopération dans ces domaines et protège le patrimoine.','Develops cooperation in these fields and protects heritage.'],
- ['MPS',null,28,false,'Modélisation du Parlement marocain','Model Moroccan Parliament','Simulation pédagogique du Parlement marocain dans le cadre d’AlphaMUN ; langue de débat à compléter.','An educational simulation of the Moroccan Parliament within AlphaMUN; debate language remains to be supplied.','S(2)'],
- ['UNICEF','en',null,false,'Fonds des Nations unies pour l’enfance','United Nations Children’s Fund','Œuvre pour les droits, la protection et le bien-être des enfants dans le monde.','Works for children’s rights, protection and well-being worldwide.'],
- ['UNODC','fr',null,false,'Office des Nations unies contre la drogue et le crime','United Nations Office on Drugs and Crime','Soutient la coopération internationale contre les drogues illicites, la criminalité et le terrorisme.','Supports international cooperation against illicit drugs, crime and terrorism.'],
-];
+import {committeeCatalogue} from '../../../shared/edition.js';
 
-export const committees = rows.map(([acronym,debateLanguage,capacity,crisis,nameFr,nameEn,definitionFr,definitionEn,annotation]) => ({
- id: acronym.toLowerCase().replace(/[^a-z]+/g,'-'), acronym, debateLanguage, capacity, crisis,
- name: {fr:nameFr,en:nameEn}, definition: {fr:definitionFr,en:definitionEn},
- logo: null, annotation: annotation || null, topic: null,
-}));
-committees.find(committee => committee.acronym === 'UN WOMEN').topic = {
- en: 'Tradition v. equality: breaking the cycle of harmful practices and sexual violence to protect women’s rights across different cultures and legal systems.',
- fr: 'Tradition et égalité : briser le cycle des pratiques néfastes et des violences sexuelles pour protéger les droits des femmes dans différents contextes culturels et systèmes juridiques.',
+const details = {
+ 'UN WOMEN': ['ONU Femmes','Works for gender equality, women’s rights and their empowerment.','Tradition versus equality: breaking the cycle of harmful practices and sexual violence to protect women’s rights across different cultures and legal systems.','Tradition et égalité : briser le cycle des pratiques néfastes et des violences sexuelles pour protéger les droits des femmes dans différents contextes culturels et systèmes juridiques.','unwomen-transparent.png'],
+ INTERPOL: ['Organisation internationale de police criminelle','Facilitates police cooperation against international crime.','False flags, hiding agendas: a criminal network is turning countries against each other.','False flags, hiding agendas : un réseau criminel dresse les pays les uns contre les autres.','interpol-transparent.png'],
+ INTERSS: ['International Relations and Security Studies','Investigates international relations and security challenges.','Behind the false flags: INTERSS must uncover who is manipulating states before a manufactured crisis escalates into international conflict.','Behind the false flags : INTERSS doit identifier les responsables de la manipulation avant qu’une crise fabriquée ne dégénère en conflit international.','interss-transparent.png'],
+ 'MOOT COURT': ['Moot Court','Examines allegations, institutional responsibility and fair trial rights.','Cornell seven — justice vs accountability: examining sexual assault allegations, institutional responsibility, and the right to a fair trial.','Cornell seven — justice contre responsabilité : allégations d’agression sexuelle, responsabilité institutionnelle et droit à un procès équitable.','moot-court.png'],
+ 'AU PSC': ['Conseil de paix et de sécurité de l’Union africaine','Prevents and resolves conflicts in Africa.','Securing the Sahel: an African strategy against terrorism and regional instability.','Securing the Sahel : une stratégie africaine contre le terrorisme et l’instabilité régionale.','aupsc-transparent.png'],
+ UNOOSA: ['Bureau des affaires spatiales des Nations unies','Promotes cooperation and peaceful uses of outer space.','Beyond borders — ensuring the peaceful use of outer space, addressing space debris, and promoting equitable access to space technologies.','Beyond borders — garantir l’usage pacifique de l’espace, traiter les débris spatiaux et favoriser un accès équitable aux technologies spatiales.','unoosa-transparent.png'],
+ CSNU: ['Conseil de sécurité des Nations unies','Maintains international peace and security.','Peace through the threat of annihilation: does nuclear possession guarantee peace or remain a permanent threat to international security?','La paix par la menace de l’anéantissement : la possession de l’arme nucléaire constitue-t-elle une garantie de paix ou une menace permanente pour la sécurité internationale ?','csnu-transparent.png'],
+ OMS: ['Organisation mondiale de la Santé','Coordinates international health cooperation and emergency response.','The emergence of an unknown virus threatens a global health crisis. Delegates must contain its spread and prevent a pandemic.','L’apparition d’un virus inconnu menace de déclencher une crise sanitaire mondiale. Les délégués doivent enrayer sa propagation et éviter une pandémie.','oms-transparent.png'],
+ CIGIA: ['Conseil international de gouvernance de l’intelligence artificielle','Governs artificial intelligence crises and technological responsibility.','The rebellion of autonomous AIs and crises against humanity: crisis governance, protection of human space, and technological responsibility.','La rébellion des IA autonomes et les crises contre l’humanité : gouvernance des crises, protection de l’espace humain et responsabilité technologique.','cigia-transparent.png'],
+ UE: ['Union européenne','A political and economic union promoting cooperation among its Member States.','Between common identity, cultural diversity and national sovereignty, how can European cohesion be preserved amid global change and internal divisions?','Entre identité commune, diversité culturelle et souveraineté nationale, comment préserver la cohésion européenne face aux mutations d’un monde globalisé et à la montée des divisions internes ?','ue-transparent.png'],
+ UNICEF: ['Fonds des Nations unies pour l’enfance','Works for children’s rights, protection and well-being worldwide.','Growing up in crisis — from Gaza to Sudan, Ukraine and the Sahel, how can States protect children’s rights and future amid armed conflicts and humanitarian crises?','Grandir en temps de crise — de Gaza au Soudan, en passant par l’Ukraine et le Sahel, comment garantir la protection, les droits fondamentaux et l’avenir des enfants face aux conflits armés et aux crises humanitaires ?','unicef-transparent.png'],
+ ONUDC: ['Office des Nations unies contre la drogue et le crime','Supports international cooperation against transnational crime.','Behind the borders of organised crime, vulnerable lives become instruments of transnational networks: where does criminal responsibility end and the duty to protect begin?','Derrière les frontières du crime organisé, des vies vulnérables deviennent les instruments de réseaux transnationaux : où s’arrête la responsabilité pénale et où commence le devoir de protection ?','unodc-transparent.png'],
+ MPS: ['Modélisation du Parlement marocain','Educational simulation of the Moroccan Parliament.','Moudawana reform: equality, family rights, traditions and modernity.','Face aux évolutions de la société marocaine, la réforme de la Moudawana soulève des questions sur l’égalité, les droits de la famille et la place des traditions dans un Maroc partagé entre modernité et préservation de son identité.','mps-transparent.png','في ظل التحولات التي يشهدها المجتمع المغربي، تطرح مراجعة مدونة الأسرة أسئلة أساسية حول المساواة وحقوق الأسرة ومكانة التقاليد في مغرب يتقاسم الحداثة والحفاظ على هويته.'],
 };
 
-export const committeeVisualNotes = {
- ICJ: 'Use the ICJ visual for the ICJ0 entry in the notes.',
- CSNU: 'Use the CSNU visual.',
- 'AU PSC': 'Use the AUPSC visual.',
- CIGIA: 'Custom committee; acronym and name confirmed by the organiser.',
- excluded: ['DISEC', '27 S'],
-};
-
-// Verified against the acronym visible in each supplied image.
-const committeeLogos = {
- INTERPOL: 'interpol-transparent.png', INTERSS: 'interss-transparent.png', 'UN WOMEN': 'unwomen-transparent.png',
- 'AU PSC': 'aupsc-transparent.png', ICJ: 'icj-transparent.png', UNOOSA: 'unoosa-transparent.png', UE: 'ue-transparent.png',
- 'CSNU': 'csnu-transparent.png', OMS: 'oms-transparent.png', ECOSOC: 'ecosoc-transparent.png',
- UNESCO: 'unesco-transparent.png', MPS: 'mps-transparent.png', CIGIA: 'cigia-transparent.png', UNICEF: 'unicef-transparent.png', UNODC: 'unodc-transparent.png',
-};
-for (const committee of committees) {
- const filename = committeeLogos[committee.acronym];
- committee.logo = filename ? `/assets/committees/${filename}` : null;
-}
-
-const finalOrder = ['INTERPOL', 'INTERSS', 'UN WOMEN', 'ICJ', 'AU PSC', 'UNOOSA', 'UNICEF', 'UNODC', 'CSNU', 'OMS', 'CIGIA', 'ECOSOC', 'UNESCO', 'UE', 'MPS'];
-committees.sort((a, b) => finalOrder.indexOf(a.acronym) - finalOrder.indexOf(b.acronym));
+export const committees = committeeCatalogue.map(({name,language,id}) => {
+ const [nameFr, definitionEn, topicEn, topicFr, logo, topicAr] = details[name];
+ return {id, acronym:name, debateLanguage:language, name:{fr:nameFr,en:nameFr}, definition:{fr:nameFr,en:definitionEn}, topic:{fr:topicFr,en:topicEn,ar:topicAr || topicFr}, logo:`/assets/committees/${logo}`};
+});
+export const committeeVisualNotes = {excluded:['ECOSOC','UNESCO','ICJ'], replacement:'MOOT COURT uses the MC / MOOT COURT visual.'};
