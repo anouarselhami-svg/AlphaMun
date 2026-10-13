@@ -1,5 +1,5 @@
 name = "alpha-mun-main"
-pages_build_output_dir = "dist"
+pages_build_output_dir = "./registration-site/dist"
 compatibility_date = "2026-10-13"
 [vars]
 REGISTRATION_EMAIL_FROM = "alphamun@youthglobalclub.com"
