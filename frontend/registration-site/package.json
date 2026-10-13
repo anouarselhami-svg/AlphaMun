@@ -1,0 +1,8 @@
+{
+  "name": "alphamun-inscription",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix .. run build:registration"
+  }
+}

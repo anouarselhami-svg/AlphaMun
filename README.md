@@ -1,34 +1,45 @@
-# Alpha MUN — React + Vite
+﻿# AlphaMUN — Pages Functions et Resend
 
-## Démarrer
-Installer Node.js 20.19+ ou 22.12+.
+Un seul dépôt Git à la racine. Les deux sites React/Vite sont conservés. Les inscriptions sont envoyées par la Pages Function POST /api/inscription du projet alphamun-inscription. Les nouvelles réponses restent dans la boîte email destinataire ; aucun stockage Sheets ni Durable Object.
 
-```bash
-npm install
-npm run dev
+| Dossier / fichier | Rôle |
+| --- | --- |
+| frontend/src/ | Site, formulaire à cinq étapes, composants et styles |
+| frontend/registration-site/ | Entrée Vite et configuration Cloudflare du site d’inscription |
+| frontend/registration-site/functions/api/inscription.js | Endpoint Pages de l’inscription |
+| frontend/functions/api/contact.js | Endpoint Pages du formulaire de contact existant |
+| backend/src/index.js | Réception, validation et réponses JSON communes |
+| backend/src/validation.js | Règles exactes des champs, comités, tarifs et confirmations |
+| backend/src/email.js | Récapitulatif lisible, Reply-To, timeout et API Resend |
+| archive/integration/ | Ancien Apps Script, conservé uniquement comme référence historique |
+
+Node.js 24.14.1 vérifié. Installer : `npm run install:all`. Sous PowerShell si les scripts sont désactivés, employer npm.cmd.
+
+Après `npm run build:all`, démarrer dans des terminaux distincts :
+
+```sh
+npm run dev:backend       # Pages inscription : 127.0.0.1:8787
+npm run dev:registration  # Vite inscription : 127.0.0.1:5174
+npm run dev:backend:main  # Pages principal/contact : 127.0.0.1:8788
+npm run dev:frontend      # Vite principal : localhost:5173
 ```
 
-Ouvrir l’adresse indiquée par Vite. Pour produire la version à héberger :
+Les proxies Vite transmettent /api et /health à leur projet Pages local. En production, les appels sont relatifs au même domaine : aucune VITE_API_BASE_URL. Les variables VITE sont publiques et ne doivent contenir aucun secret.
 
-```bash
-npm run build
-npm run preview
+Copier les .dev.vars.example vers .dev.vars dans les dossiers frontend/registration-site/ et frontend/ pour configurer les secrets locaux de chaque projet. Le fichier d’inscription local est déjà configuré avec la clé fournie et alphamun@youthglobalclub.com comme expéditeur/destinataire ; il est ignoré par Git. Aucun secret dans les fichiers d’exemple. Voir [configuration Cloudflare/Resend](deployment/DEUX-SITES.md).
+
+```sh
+npm run build:all          # frontend/dist + frontend/registration-site/dist
+npm run build:backend      # compilation locale des deux Pages Functions, sans publication
+npm test                  # 6 tests backend + 21 tests frontend ; après builds
+npm run test:browser       # Edge, soumissions simulées
+npm --prefix backend run test:runtime # bundle Pages dans workerd, Resend simulé
 ```
 
-## Organisation
-- `src/components/` : composants de chaque section.
-- `src/hooks/useCountdown.js` : compte à rebours avec nettoyage de l’intervalle.
-- `src/services/registration.js` : envoi vers Google Sheets.
-- `src/config.js` : date et comités.
-- `src/styles.css` : identité crème, bordeaux, dorée et mise en page responsive.
-- `public/assets/` : emblème et référence de marque.
-- `integration/Code.gs` : Google Apps Script.
+Le serveur reçoit toutes les réponses en application/x-www-form-urlencoded, contrôle leur taille et reprend les règles du formulaire. Packs : Normal 500 MAD et Premium 1 500 MAD. Il annonce le succès seulement après réception d’un ID d’email accepté par Resend : JSON ok:true, accepted:true, submissionId. Une erreur renvoie ok:false et un code, sans réponses personnelles ni secret. Le succès indique l’acceptation par Resend, pas la livraison finale, le paiement ou l’admission.
 
-## Configurer
-Copier `.env.example` en `.env`, ajouter l’URL /exec de Google Apps Script et l’e-mail officiel. Les valeurs VITE sont publiques : aucun secret ne doit y être placé. Redémarrer Vite après changement et reconstruire pour la production.
+Une tentative avec les mêmes réponses conserve son UUID dans le formulaire. La clé Resend et le contenu d’email sont identiques pour les retries ; des réponses modifiées reçoivent un nouvel UUID. Resend déduplique pendant 24 heures, sans garantie de déduplication au-delà. L’identifiant reste dans l’email pour faciliter les vérifications. Les cinq étapes, placeholders, traductions FR/EN, états d’envoi et réponses après échec sont conservés.
 
-Créer un Google Sheets, ouvrir Extensions > Apps Script, copier `integration/Code.gs`, puis déployer une application Web exécutée en tant que propriétaire avec l’accès nécessaire aux visiteurs. Tester une soumission depuis le domaine final et vérifier la ligne dans Sheets et la réponse JSON (redirections/CORS à vérifier). Aucun succès n’est annoncé sans réponse positive.
+Les anciennes inscriptions restent dans leur tableur : aucune opération distante sur ces données n’a été exécutée. Les appels, variables et relais Apps Script sont retirés du parcours actif. Le lien indépendant Google Forms du recrutement staff est conservé. La mention de consentement provisoire déjà présente reste à compléter avant ouverture publique.
 
-Confirmer l’année, l’heure, les comités, les horaires, le lieu et les liens sociaux avant ouverture. Le contact ouvre la messagerie du visiteur. Ajouter les mentions de confidentialité et la protection antispam avant ouverture publique. La police Breathing attend son fichier autorisé. L’emblème est issu de la planche fournie, à remplacer par le vectoriel original si disponible.
-
-Sans URL configurée, les inscriptions ne sont pas envoyées. Aucun compte utilisateur ni paiement intégré.
+Voir [les résultats des tests](deployment/TESTS.md). Aucun déploiement public ni email réel effectué pendant cette préparation.

@@ -1,0 +1,16 @@
+{
+  "name": "alphamun-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node pages.mjs dev registration",
+    "test": "node --test tests/*.test.js",
+    "build": "node pages.mjs build registration && node pages.mjs build main",
+    "test:runtime": "node runtime-check.mjs",
+    "dev:main": "node pages.mjs dev main"
+  },
+  "devDependencies": {
+    "miniflare": "5.20261006.2-beta",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,7 @@
+name = "alphamun-inscription"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-13"
+[vars]
+REGISTRATION_EMAIL_FROM = "alphamun@youthglobalclub.com"
+REGISTRATION_EMAIL_TO = "alphamun@youthglobalclub.com"
+ALLOWED_ORIGINS = "http://localhost:5174,http://127.0.0.1:5174"

@@ -1,3 +1,0 @@
-﻿# Local Cloudflare Pages runtime variables. Do not commit real values.
-APPS_SCRIPT_URL=https://script.google.com/macros/s/DEPLOYMENT_ID/exec
-SUBMISSION_TOKEN=REPLACE_WITH_THE_SAME_PRIVATE_TOKEN_AS_APPS_SCRIPT

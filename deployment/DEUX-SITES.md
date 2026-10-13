@@ -1,23 +1,25 @@
-﻿> Procédure actuelle : [centralisation des formulaires — version 7](../integration/MISE-A-JOUR.md). Les tarifs sont 500 / 1500 MAD. Les deux projets utilisent des secrets d’exécution privés et leur propre Pages Function.
+﻿# Configuration Cloudflare Pages et Resend
 
-# Deux sites AlphaMUN
+Les deux projets existants sont conservés. Il n’y a plus de Worker séparé ni de Durable Object à déployer.
 
-| Site | Entrée | Build | Sortie | Route |
-|---|---|---|---|---|
-| Principal | `src/main.jsx` | `npm.cmd run build:main` | `dist` | `functions/api/contact.js` |
-| Inscription | `registration-site/main.jsx` | `npm.cmd run build:registration` | `registration-site/dist` | `registration-site/functions/api/registration.js` |
+| Projet Pages | Racine du projet | Commande de build | Sortie |
+| --- | --- | --- | --- |
+| alpha-mun-main | frontend | npm ci && npm run build:main | dist |
+| alphamun-inscription | frontend/registration-site | npm ci --prefix .. && npm --prefix .. run build:registration | dist |
 
-Les deux Functions réutilisent `src/server/submission-handler.js`, l’URL `/exec` existante et le même tableur. Configurer `APPS_SCRIPT_URL` et `SUBMISSION_TOKEN` sur **les deux projets** Pages, côté serveur. Le binding d’exécution historique `VITE_APPS_SCRIPT_URL` reste accepté, mais n’est pas lu par le navigateur.
+La racine du site d’inscription doit être frontend/registration-site pour que Cloudflare découvre son dossier functions et sa configuration wrangler.toml. Les imports backend/src sont dans le même dépôt Git, sans dépendances de production. Ne pas publier uniquement dist par glisser-déposer : les Functions doivent être compilées par l’intégration Git Pages ou par Wrangler depuis la racine du projet correspondant. Les sorties à la racine du dépôt des commandes npm sont frontend/dist et frontend/registration-site/dist.
 
-Préserver les domaines `youthglobalclub.com` et `inscription.youthglobalclub.com`. Le site principal se déploie à partir de la racine et le site d’inscription à partir de `registration-site` pour découvrir leurs dossiers `functions`. Ne pas uploader seulement les fichiers statiques. Aucune commande de publication n’est exécutée pendant cette préparation.
+## Resend et variables serveur
 
-Installation commune : `npm ci` à la racine. Contrôles : `npm.cmd run build:all`, `npm.cmd test`, puis `node scripts/verify-browser.mjs` (réponses simulées).
+1. Dans Resend, vérifier youthglobalclub.com : ajouter les enregistrements DNS demandés et attendre le statut Verified. Conserver les MX de la messagerie destinataire ; ne pas remplacer la configuration de réception du courrier.
+2. L’expéditeur choisi est alphamun@youthglobalclub.com. Le destinataire est également alphamun@youthglobalclub.com. Le participant apparaît en Reply-To. La vérification réelle du compte Resend n’a pas été consultée pendant cette préparation.
+3. Dans Cloudflare → Workers & Pages → alphamun-inscription → Settings → Variables and Secrets, définir RESEND_API_KEY en tant que SECRET chiffré. Utiliser la clé serveur fournie, sans la copier dans Git, les variables VITE ou le navigateur.
+4. Définir REGISTRATION_EMAIL_FROM=alphamun@youthglobalclub.com côté serveur. REGISTRATION_EMAIL_TO=alphamun@youthglobalclub.com est déjà dans wrangler.toml. Configurer production et preview selon les environnements réellement utilisés ; une preview avec ces valeurs enverra des emails réels.
+5. Pour conserver le formulaire de contact du site principal, configurer les mêmes trois paramètres dans alpha-mun-main. Chaque projet Pages a son environnement indépendant. En local, utiliser son propre fichier .dev.vars, ignoré par Git.
+6. Retirer les anciens secrets et variables Apps Script/Sheets du tableau de bord lors de la future mise en service. Ne pas supprimer le tableur ni les anciennes inscriptions. VITE_API_BASE_URL n’est plus utilisé ; retirer sa configuration de build historique.
 
-Consulter [MISE-A-JOUR.md](../integration/MISE-A-JOUR.md) pour :
-- conserver le tableur et actualiser **le même déploiement Apps Script** ;
-- préparer les colonnes sans supprimer/reclasser les anciennes lignes ;
-- configurer les secrets des deux projets et utiliser un environnement de test ;
-- choisir manuellement la destination du Google Forms staff ;
-- vérifier les lignes réellement créées, les tarifs et la nouvelle tentative sans doublon.
+Les Functions autorisent l’origine de leur propre projet. Les origines locales des proxies sont explicites dans ALLOWED_ORIGINS. Aucun domaine Worker ou CORS entre les deux sites n’est nécessaire : chaque site appelle son endpoint relatif.
 
-Références : [Pages Functions](https://developers.cloudflare.com/pages/functions/get-started/), [secrets](https://developers.cloudflare.com/pages/functions/bindings/), [domaines personnalisés](https://developers.cloudflare.com/pages/configuration/custom-domains/).
+Les tests de livraison réelle restent à faire après autorisation : vérifier le statut Resend et le récapitulatif reçu, puis la répétition du même ID et des mêmes réponses. Aucun email réel, changement DNS, secret Cloudflare distant ou déploiement public n’a été effectué ici.
+
+Les clés d’idempotence Resend sont conservées 24 heures : [documentation Resend](https://resend.com/docs/dashboard/emails/idempotency-keys). Le routage des endpoints suit [Pages Functions](https://developers.cloudflare.com/pages/functions/routing/). Les [secrets et variables Pages](https://developers.cloudflare.com/pages/functions/bindings/#environment-variables) restent côté serveur.

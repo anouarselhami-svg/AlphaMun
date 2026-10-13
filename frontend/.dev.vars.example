@@ -1,0 +1,4 @@
+RESEND_API_KEY=
+REGISTRATION_EMAIL_TO=alphamun@youthglobalclub.com
+# Adresse appartenant ? un domaine v?rifi? dans Resend
+REGISTRATION_EMAIL_FROM=alphamun@youthglobalclub.com
