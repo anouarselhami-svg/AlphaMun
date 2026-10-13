@@ -5,9 +5,9 @@ Les deux projets existants sont conservés. Il n’y a plus de Worker séparé n
 | Projet Pages | Racine du projet | Commande de build | Sortie |
 | --- | --- | --- | --- |
 | alpha-mun-main | frontend | npm ci && npm run build:main | dist |
-| alphamun-inscription | frontend/registration-site | npm ci --prefix .. && npm --prefix .. run build:registration | dist |
+| alphamun-inscription | frontend | npm run build | registration-site/dist |
 
-La racine du site d’inscription doit être frontend/registration-site pour que Cloudflare découvre son dossier functions et sa configuration wrangler.toml. Les imports backend/src sont dans le même dépôt Git, sans dépendances de production. Ne pas publier uniquement dist par glisser-déposer : les Functions doivent être compilées par l’intégration Git Pages ou par Wrangler depuis la racine du projet correspondant. Les sorties à la racine du dépôt des commandes npm sont frontend/dist et frontend/registration-site/dist.
+La racine du site d’inscription est frontend : Cloudflare découvre frontend/functions/api/inscription.js et frontend/wrangler.toml. Le build par défaut produit les deux sites, dont registration-site/dist attendu par la configuration actuelle. Les imports backend/src restent dans le même dépôt. Ne pas publier uniquement les fichiers statiques par glisser-déposer. Le site principal conserve sa commande build:main et sa sortie frontend/dist ; pour son projet Pages, conserver la sortie dist (une publication Wrangler doit préciser dist explicitement), et non registration-site/dist. Le wrangler.toml courant décrit la sortie du projet d’inscription ; son nom historique ne doit pas servir à sélectionner le projet principal par erreur. Les secrets actuels restent dans chaque environnement Pages, accessibles via context.env.
 
 ## Resend et variables serveur
 

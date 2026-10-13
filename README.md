@@ -6,7 +6,7 @@ Un seul dépôt Git à la racine. Les deux sites React/Vite sont conservés. Les
 | --- | --- |
 | frontend/src/ | Site, formulaire à cinq étapes, composants et styles |
 | frontend/registration-site/ | Entrée Vite et configuration Cloudflare du site d’inscription |
-| frontend/registration-site/functions/api/inscription.js | Endpoint Pages de l’inscription |
+| frontend/functions/api/inscription.js | Endpoint Pages de l’inscription |
 | frontend/functions/api/contact.js | Endpoint Pages du formulaire de contact existant |
 | backend/src/index.js | Réception, validation et réponses JSON communes |
 | backend/src/validation.js | Règles exactes des champs, comités, tarifs et confirmations |
@@ -31,7 +31,7 @@ Copier les .dev.vars.example vers .dev.vars dans les dossiers frontend/registrat
 ```sh
 npm run build:all          # frontend/dist + frontend/registration-site/dist
 npm run build:backend      # compilation locale des deux Pages Functions, sans publication
-npm test                  # 6 tests backend + 21 tests frontend ; après builds
+npm test                  # 7 tests backend + 21 tests frontend ; après builds
 npm run test:browser       # Edge, soumissions simulées
 npm --prefix backend run test:runtime # bundle Pages dans workerd, Resend simulé
 ```
@@ -43,3 +43,5 @@ Une tentative avec les mêmes réponses conserve son UUID dans le formulaire. La
 Les anciennes inscriptions restent dans leur tableur : aucune opération distante sur ces données n’a été exécutée. Les appels, variables et relais Apps Script sont retirés du parcours actif. Le lien indépendant Google Forms du recrutement staff est conservé. La mention de consentement provisoire déjà présente reste à compléter avant ouverture publique.
 
 Voir [les résultats des tests](deployment/TESTS.md). Aucun déploiement public ni email réel effectué pendant cette préparation.
+
+[Correction du routage 405 et configuration de production](deployment/CORRECTION-405.md).

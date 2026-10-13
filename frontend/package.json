@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "npm run build:all",
     "preview": "vite preview --host 0.0.0.0",
     "dev:registration": "vite --config registration-site/vite.config.js --configLoader runner --host 127.0.0.1 --port 5174",
     "build:main": "vite build --configLoader runner",

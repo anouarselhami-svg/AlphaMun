@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
 import worker from '../src/index.js';
 import {emailPayload, sendEmail, fieldLabels} from '../src/email.js';
 import {validateSubmission, registrationFields} from '../src/validation.js';
@@ -53,7 +54,7 @@ test('Pages endpoint retries reuse the exact Resend key and payload; errors neve
  } finally {globalThis.fetch=original;}
 });
 test('actual Pages route entrypoints dispatch registrations and contacts',async()=>{
- const {onRequest:registration}=await import('../../frontend/registration-site/functions/api/inscription.js');
+ const {onRequest:registration}=await import('../../frontend/functions/api/inscription.js');
  const {onRequest:contact}=await import('../../frontend/functions/api/contact.js');
  const original=fetch;globalThis.fetch=async()=>Response.json({id:'mock-email'});
  try {
@@ -61,4 +62,14 @@ test('actual Pages route entrypoints dispatch registrations and contacts',async(
   const req=new Request('https://youthglobalclub.com/api/contact',{method:'POST',body:new URLSearchParams({submission_id:data.submission_id,nom:'TEST',email:data.email,message:'TEST contact',langue_site:'fr'})});
   const result=await contact({request:req,env});assert.equal(result.status,200);assert.equal((await result.json()).accepted,true);
  } finally {globalThis.fetch=original;}
+});
+test('both generated sites route API requests to Functions without static overrides',async()=>{
+ for(const folder of ['../../frontend/dist/','../../frontend/registration-site/dist/']) {
+  const root=new URL(folder,import.meta.url);
+  const routes=JSON.parse(await fs.readFile(new URL('_routes.json',root),'utf8'));
+  assert.equal(routes.version,1);assert.ok(routes.include.includes('/api/*'));assert.deepEqual(routes.exclude,[]);
+  const redirects=await fs.readFile(new URL('_redirects',root),'utf8');
+  assert.equal(redirects.split('\n').filter(line=>line.trim()&&!line.trim().startsWith('#')).length,0);
+  await assert.rejects(fs.access(new URL('_worker.js',root)));
+ }
 });
