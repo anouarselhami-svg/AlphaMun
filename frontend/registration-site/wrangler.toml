@@ -2,4 +2,4 @@ name = "alphamun-inscription"
 pages_build_output_dir = "./registration-site/dist"
 compatibility_date = "2026-10-13"
 [vars]
-ALLOWED_ORIGINS = "http://localhost:5174,http://127.0.0.1:5174"
+ALLOWED_ORIGINS = "https://inscription.youthglobalclub.com,https://alphamun-inscription.pages.dev"
