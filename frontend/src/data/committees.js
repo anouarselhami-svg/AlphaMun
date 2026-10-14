@@ -18,6 +18,6 @@ const details = {
 
 export const committees = committeeCatalogue.map(({name,language,id}) => {
  const [nameFr, definitionEn, topicEn, topicFr, logo, topicAr] = details[name];
- return {id, acronym:name, debateLanguage:language, name:{fr:nameFr,en:nameFr}, definition:{fr:nameFr,en:definitionEn}, topic:{fr:topicFr,en:topicEn,ar:topicAr || topicFr}, logo:`/assets/committees/${logo}`};
+ return {id, acronym:name, debateLanguage:language, name:{fr:nameFr,en:nameFr}, definition:{fr:nameFr,en:definitionEn}, topic:{fr:topicFr,en:topicEn,ar:topicAr || topicFr}, logo:name === 'MOOT COURT' ? '/images/committees/moot-court-transparent.jpeg' : `/assets/committees/${logo}`};
 });
 export const committeeVisualNotes = {excluded:['ECOSOC','UNESCO','ICJ'], replacement:'MOOT COURT uses the MC / MOOT COURT visual.'};
