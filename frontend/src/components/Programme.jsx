@@ -4,11 +4,12 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { programme } from '../data/programme';
 import { ArrowDown } from './icons';
 
-// The supplied UIR and Lalla-Laaroussa filenames are reversed; match their actual photographs.
+// Photos from the published version (5687411), retained in frontend/public.
+// Historical UIR and Lalla-Laaroussa filenames are reversed; match their actual photographs.
 const days = [
-  {name:'UIT',venue:'Université Ibn Tofail — UIT, Kénitra',image:'/assets/venues/uit.jpg',width:1672,height:941,position:'center',en:'The beginning of an inspiring diplomatic journey.',fr:'Le début d’un parcours diplomatique inspirant.'},
-  {name:'UIR',venue:'Université Internationale de Rabat — UIR',image:'/assets/venues/uir.jpg',width:1672,height:941,position:'center',en:'A day of diplomacy, debate, and collaboration.',fr:'Une journée de diplomatie, de débat et de collaboration.'},
-  {name:'Palais Lalla Laaroussa',venue:'Palais Lalla Laaroussa, Kénitra',image:'/assets/venues/lalla-laaroussa.jpg',width:1086,height:1448,position:'center 68%',en:'Celebrating connections, achievements, and unforgettable moments.',fr:'Célébrer les rencontres, les réussites et les moments inoubliables.'},
+  {name:'UIT',venue:'Université Ibn Tofail — UIT, Kénitra',image:'/ENCGK.png',width:1672,height:941,position:'center',en:'The beginning of an inspiring diplomatic journey.',fr:'Le début d’un parcours diplomatique inspirant.'},
+  {name:'UIR',venue:'Université Internationale de Rabat — UIR',image:'/Lalla-Laaroussa.png',width:1672,height:941,position:'center',en:'A day of diplomacy, debate, and collaboration.',fr:'Une journée de diplomatie, de débat et de collaboration.'},
+  {name:'Palais Lalla Laaroussa',venue:'Palais Lalla Laaroussa, Kénitra',image:'/UIR.png',width:1086,height:1448,position:'center 68%',en:'Celebrating connections, achievements, and unforgettable moments.',fr:'Célébrer les rencontres, les réussites et les moments inoubliables.'},
 ];
 
 function Schedule({ index, open }) {
