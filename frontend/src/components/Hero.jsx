@@ -18,7 +18,7 @@ export default function Hero() {
       <p className="eyebrow"><span className="dot" />{t("LA JEUNESSE PREND LA PAROLE")}</p>
       <h1>{t("La parole")}<br />{t("devient")} <em>{t("action.")}</em></h1>
       <p className="intro">{t("Trois jours pour débattre, créer des liens et faire entendre votre voix. Entrez dans la peau d’un diplomate avec Alpha MUN.")}</p>
-      <div className="hero-actions"><a className="button" href="/#packs">{t("Devenir délégué")} <ArrowUpRight /></a><a className="text-link" href="#histoire">{t("Découvrir l’expérience")} <ArrowDown /></a></div>
+      <div className="hero-actions"><a className="button" href="/#packs">{t("Devenir délégué")} <ArrowUpRight /></a><a className="button outline" href="/assets/code-de-conduite.pdf">{t("Lire le code de conduite")} <ArrowUpRight /></a><a className="text-link" href="#histoire">{t("Découvrir l’expérience")} <ArrowDown /></a></div>
       <div className="hero-foot"><div className="hero-date"><span className="date-number">{t("22, 23 et 24 janvier")}</span><span><b>{t("KÉNITRA, MAROC")}</b></span></div><span className="edition">{t("8e édition")}<small>{t("270 participants visés")}</small></span></div>
     </div>
     <div className="hero-art">

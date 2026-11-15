@@ -1,5 +1,5 @@
 ﻿export const english = Object.fromEntries([
-['LA JEUNESSE PREND LA PAROLE','YOUNG VOICES TAKE THE FLOOR'],['La parole','Words'],['devient','become'],['action.','action.'],
+['LA JEUNESSE PREND LA PAROLE','YOUNG VOICES TAKE THE FLOOR'],['Lire le code de conduite','Read the code of conduct'],['La parole','Words'],['devient','become'],['action.','action.'],
 ['Trois jours pour débattre, créer des liens et faire entendre votre voix. Entrez dans la peau d’un diplomate avec Alpha MUN.','Three days to debate, connect and make your voice heard. Step into the role of a diplomat with Alpha MUN.'],
 ['Devenir délégué','Become a delegate'],['Découvrir l’expérience','Discover the experience'],['22, 23 et 24 janvier','January 22, 23 and 24'],['KÉNITRA, MAROC','KÉNITRA, MOROCCO'],['7 ans','7 years'],['d’impact & de leadership','of impact & leadership'],['VOTRE VOIX.','YOUR VOICE.'],['NOTRE MONDE.','OUR WORLD.'],['S’inscrire','Register'],['DIPLOMATIE','DIPLOMACY'],['Logo Alpha MUN','Alpha MUN logo'],
 ['01 / L’ESPRIT ALPHA MUN','01 / THE ALPHA MUN SPIRIT'],['Un monde à comprendre.','A world to understand.'],['Une voix à','A voice to'],['construire.','develop.'],
