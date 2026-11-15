@@ -21,6 +21,7 @@ function CommitteeCard({ committee, language, open, onToggle }) {
       <span className="committee-logo">{committee.logo && failedLogo !== committee.logo
       ? <img src={committee.logo} alt={`${english ? 'Logo of' : 'Logo du comité'} ${committee.acronym}`} width="160" height="100" loading="lazy" onError={() => setFailedLogo(committee.logo)} />
       : <span className="committee-logo-missing">{english ? 'Logo unavailable' : 'Logo indisponible'}</span>}</span>
+      <span className="committee-title">{english ? 'Committee' : 'Comité'} {committee.acronym}</span>
       <ArrowDown />
     </button>
     <div className="committee-details" id={`committee-details-${committee.id}`} hidden={!open} role="region" aria-labelledby={`committee-toggle-${committee.id}`} dir={committee.acronym === 'MPS' ? 'rtl' : undefined}>

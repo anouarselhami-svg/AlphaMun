@@ -2,8 +2,8 @@
 export const edition = {name:'AlphaMUN', number:8, targetParticipants:270, start:'2027-01-22T14:00:00+01:00', end:'2027-01-24T21:00:00+01:00', timeZone:'Africa/Casablanca', organisation:'Groupe Pédagogique Alpha', city:'Kénitra'};
 export const debateLanguages = {en:{fr:'Anglais',en:'English'},fr:{fr:'Français',en:'French'},ar:{fr:'Arabe',en:'Arabic'}};
 export const committeeCatalogue = [
- {name:'UN WOMEN',language:'en'}, {name:'INTERPOL',language:'en'}, {name:'INTERSS',language:'en'}, {name:'MOOT COURT',language:'en'}, {name:'AU PSC',language:'en'}, {name:'UNOOSA',language:'en'},
- {name:'CSNU',language:'fr'}, {name:'OMS',language:'fr'}, {name:'CIGIA',language:'fr'}, {name:'UE',language:'fr'}, {name:'UNICEF',language:'fr'}, {name:'ONUDC',language:'fr'}, {name:'MPS',language:'ar'},
+ {name:'UN WOMEN',language:'en'}, {name:'INTERPOL',language:'en'}, {name:'INTERSS',language:'en'}, {name:'MOOT COURT',language:'en'}, {name:'UNOOSA',language:'en'},
+ {name:'DISEC',language:'fr'}, {name:'OMS',language:'fr'}, {name:'Conseil de Sécurité',language:'fr'}, {name:'UE',language:'fr'}, {name:'UNICEF',language:'fr'}, {name:'MPS',language:'ar'},
 ].map(committee=>({...committee,id:committee.name.toLowerCase().replace(/[^a-z]+/g,'-')}));
 export const packages = {
  '500':{amount:500,fr:'Pack Normal',en:'Normal Package'},

@@ -1,5 +1,3 @@
-import Programme from './Programme';
-import Board from './Board';
 import { useLanguage } from '../i18n/LanguageContext';
 import { config } from '../config';
 
@@ -16,8 +14,6 @@ function StaffSection() {
 
 export default function EventDetails() {
   return <>
-    <Programme />
-    <Board />
     <StaffSection />
   </>;
 }
