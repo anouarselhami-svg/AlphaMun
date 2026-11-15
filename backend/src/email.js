@@ -3,7 +3,7 @@ import { debateLanguages, packageLabel } from '../../shared/edition.js';
 
 export const fieldLabels = {
  prenom:'Prénom', nom:'Nom', age:'Âge', email:'Email', telephone:'Téléphone', contact_parent:'Téléphone du parent ou tuteur', ville:'Ville', etablissement:'Établissement', niveau:'Niveau scolaire',
- comite_choix_1:'Premier choix de comité', comite_choix_2:'Deuxième choix de comité', comite_choix_3:'Troisième choix de comité', participations_mun:'Nombre de participations MUN', experience_details:'Détails de l’expérience MUN', motivation:'Motivation', attentes:'Attentes', pack:'Pack choisi', logistique:'Logistique et besoins particuliers',
+ comite_choix_1:'Premier choix de comité', comite_choix_2:'Deuxième choix de comité', comite_choix_3:'Troisième choix de comité', participations_mun:'Nombre de participations MUN', experience_details:'Détails de l’expérience MUN', motivation:'Motivation', attentes:'Attentes', pack:'Pack choisi', logistique:'Précisions complémentaires',
  confirmation_pack:'Conditions du pack acceptées', consentement:'Consentement au traitement des informations', code_conduite:'Code de conduite accepté', exactitude:'Exactitude des informations confirmée',
  langue_comite:'Langue de comité souhaitée', comite:'Comité complémentaire', motivation_comite:'Motivation du comité complémentaire', experience:'Expérience complémentaire', hebergement:'Besoin d’hébergement', restrictions_alimentaires:'Restrictions alimentaires', besoins_particuliers:'Autres besoins particuliers', reglement:'Règlement accepté', message:'Message', langue_site:'Langue du site',
 };

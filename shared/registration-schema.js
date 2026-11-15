@@ -1,7 +1,7 @@
 import {committeeCatalogue, packages, debateLanguages} from './edition.js';
 export const registrationCommittees = committeeCatalogue;
-export const registrationFields = ['prenom','nom','age','email','telephone','contact_parent','ville','etablissement','niveau','comite_choix_1','comite_choix_2','comite_choix_3','participations_mun','experience_details','motivation','attentes','pack','logistique','confirmation_pack','consentement','code_conduite','exactitude'];
-export const registrationOptionalFields = ['langue_comite','comite','motivation_comite','experience','hebergement','restrictions_alimentaires','besoins_particuliers','reglement'];
+export const registrationFields = ['prenom','nom','age','email','telephone','contact_parent','ville','etablissement','niveau','comite_choix_1','comite_choix_2','comite_choix_3','participations_mun','experience_details','motivation','attentes','pack','hebergement','restrictions_alimentaires','besoins_particuliers','logistique','confirmation_pack','consentement','code_conduite','exactitude'];
+export const registrationOptionalFields = ['langue_comite','comite','motivation_comite','experience','reglement'];
 export const contactFields = ['nom','email','message','langue_site'];
 export const submissionFields = type => type === 'contact' ? contactFields : [...registrationFields,...registrationOptionalFields];
 const phone = text => /^\+?[\d\s().-]+$/.test(text) && text.replace(/\D/g,'').length>=7 && text.replace(/\D/g,'').length<=15;

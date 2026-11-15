@@ -21,18 +21,20 @@ test('health, CORS, preflight, methods, invalid body and missing configuration',
 });
 test('all original rules and tariffs',()=>{
   for(const pack of ['500','1500']) assert.equal(validateSubmission('registration',{...data,pack}),null);
-  for(const change of [{age:'0'},{age:'1.5'},{participations_mun:'-1'},{telephone:'123'},{contact_parent:''},{pack:'550'},{consentement:'false'},{comite_choix_2:'INTERPOL'},{comite_choix_1:'invalid'},{email:'bad'},{hebergement:'maybe'},{motivation:''},{nom:'x'.repeat(10001)}]) assert.ok(validateSubmission('registration',{...data,...change}));
+  for(const change of [{age:'0'},{age:'1.5'},{participations_mun:'-1'},{telephone:'123'},{contact_parent:''},{pack:'550'},{consentement:'false'},{comite_choix_2:'INTERPOL'},{comite_choix_1:'invalid'},{email:'bad'},{hebergement:'maybe'},{restrictions_alimentaires:''},{besoins_particuliers:''},{motivation:''},{nom:'x'.repeat(10001)}]) assert.ok(validateSubmission('registration',{...data,...change}));
 });
 test('complete readable email with optional answers, confirmations, prices, languages and Reply-To',()=>{
  for(const pack of ['500','1500']) {
   const message=emailPayload('registration',{...data,pack},env);
-  for(const field of registrationFields.filter(field => field !== 'logistique')) assert.ok(message.text.includes(fieldLabels[field]+' : '),field);
+  for(const field of registrationFields.filter(field => !['hebergement','restrictions_alimentaires','besoins_particuliers','logistique'].includes(field))) assert.ok(message.text.includes(fieldLabels[field]+' : '),field);
   for(const field of ['prenom','nom','age','email','telephone','contact_parent','ville','etablissement','niveau','comite_choix_1','comite_choix_2','comite_choix_3','participations_mun','experience_details','motivation','attentes']) assert.ok(message.text.includes(fieldLabels[field]+' : '+data[field]),field);
   assert.ok(message.text.includes('Logistique et besoins particuliers :\n- Hébergement : Oui\n- Restrictions alimentaires : no nuts\n- Autres besoins particuliers : none\n- Précisions complémentaires : TEST'));
   assert.ok(message.text.includes('Code de conduite accepté : Oui'));
   assert.ok(message.html.includes('<h2>Informations personnelles</h2>'));
   assert.ok(message.html.includes('<h2>Logistique et besoins particuliers</h2>'));
   assert.ok(message.html.includes('<th>Restrictions alimentaires</th><td>no nuts</td>'));
+  assert.equal((message.html.match(/<h2>Logistique et besoins particuliers<\/h2>/g) || []).length,1);
+  assert.equal((message.html.match(/<th>Précisions complémentaires<\/th>/g) || []).length,1);
   assert.ok(emailPayload('registration',{...data,motivation:'<script>alert(1)</script>'},env).html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
   assert.ok(message.text.includes('Tarif : '+pack+' DH'));assert.ok(message.text.includes('Langue du choix 3 : Arabe'));assert.equal(message.reply_to,data.email);assert.deepEqual(message.to,['alphamun@youthglobalclub.com']);
  }
